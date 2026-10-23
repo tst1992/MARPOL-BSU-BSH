@@ -1,0 +1,3178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MARPOL-BSU&amp;BSH</title>
+<meta name="description" content="Trainer für die Prüfungsfragen MARPOL, BSU und BSH des Sportseeschifferscheins.">
+<meta name="theme-color" content="#0A121C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MARPOL/BSU">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+/* ==========================================================================
+   MARPOL-BSU&BSH
+   Gestaltung übernommen aus dem SSS-Trainer Seemannschaft.
+   Farbwelt: Positionslichter bei Nacht. Backbordrot, Steuerbordgrün,
+   Topplichtweiss auf Nachtsee. Zahlen laufen im Monospace.
+   ========================================================================== */
+
+:root{
+  --sea-900:#0A121C;
+  --sea-850:#0E1927;
+  --sea-800:#132335;
+  --sea-700:#1B3149;
+  --line:#25405C;
+  --line-soft:#1A2C40;
+
+  --fog:#C6D3E0;
+  --fog-dim:#7E93A9;
+  --white-light:#F1F6FB;
+
+  --stbd:#3CC28C;         /* Steuerbord: richtig */
+  --stbd-dim:#16382C;
+  --port:#E8555E;         /* Backbord: falsch */
+  --port-dim:#3D1A20;
+  --brass:#D8A544;        /* teilweise, Hinweise */
+  --brass-dim:#3A2E14;
+
+  --r:14px;
+  --tap:44px;
+
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+}
+
+*{box-sizing:border-box}
+/* Muss vor allen display-Regeln stehen, sonst fangen ausgeblendete Overlays Klicks ab. */
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+body{
+  background:var(--sea-900);
+  color:var(--fog);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:env(safe-area-inset-bottom);
+  overflow-wrap:break-word;
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+.skiplink{position:absolute;left:-9999px;top:0;background:var(--brass);color:#1A1204;padding:10px 14px;z-index:60;border-radius:0 0 8px 0}
+.skiplink:focus{left:0}
+
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px;border-radius:6px}
+
+/* ---------- Kopfzeile ---------- */
+.top{position:sticky;top:0;z-index:30;background:var(--sea-900);padding-top:env(safe-area-inset-top)}
+.top-row{display:flex;align-items:center;gap:6px;padding:8px 10px;max-width:660px;margin:0 auto}
+.brand{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:4px}
+.brand-name{font-size:.82rem;font-weight:650;letter-spacing:.10em;text-transform:uppercase;color:var(--white-light)}
+.crumb{font-size:.72rem;color:var(--fog-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Signatur: die drei Positionslichter als Horizontlinie */
+.horizon{display:flex;height:2px}
+.horizon i{flex:1}
+.horizon .port{background:linear-gradient(90deg,var(--port),rgba(232,85,94,.15))}
+.horizon .mast{background:rgba(241,246,251,.30);flex:.5}
+.horizon .stbd{background:linear-gradient(90deg,rgba(60,194,140,.15),var(--stbd))}
+
+.icon-btn{
+  min-width:var(--tap);min-height:var(--tap);
+  display:grid;place-items:center;
+  background:none;border:0;color:var(--fog-dim);cursor:pointer;border-radius:10px;padding:0;
+}
+.icon-btn:hover{color:var(--white-light);background:var(--sea-800)}
+.icon-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Layout ---------- */
+main{max-width:640px;margin:0 auto;padding:20px 16px 96px}
+.screen{animation:rise .28s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.h-display{
+  font-size:clamp(2rem,9vw,2.9rem);line-height:1.03;margin:8px 0 12px;
+  color:var(--white-light);font-weight:680;letter-spacing:-.025em;
+}
+.h-section{font-size:1.18rem;margin:0;color:var(--white-light);font-weight:640;letter-spacing:-.01em}
+.lede{color:var(--fog-dim);margin:0 0 26px;font-size:.95rem}
+.eyebrow{
+  font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--fog-dim);margin:0 0 10px;font-weight:640;
+}
+
+/* ---------- Auswahlkacheln ---------- */
+.choices{display:grid;gap:8px;margin-bottom:28px}
+.choices.row4{grid-template-columns:repeat(4,1fr)}
+.choice{
+  display:flex;flex-direction:column;gap:3px;text-align:left;
+  min-height:var(--tap);padding:13px 15px;
+  background:var(--sea-850);border:1px solid var(--line-soft);border-radius:var(--r);
+  color:var(--fog);cursor:pointer;font:inherit;transition:border-color .15s,background .15s;
+}
+.choices.row4 .choice{align-items:center;text-align:center;padding:14px 4px}
+.choice:hover{border-color:var(--line)}
+.choice[aria-checked="true"]{border-color:var(--stbd);background:var(--sea-800)}
+.choice-title{color:var(--white-light);font-weight:620;font-size:.98rem}
+.choices.row4 .choice-title{font-family:var(--mono);font-size:1.35rem;font-weight:600;line-height:1.1}
+.choice-sub{font-size:.8rem;color:var(--fog-dim);line-height:1.35}
+
+/* ---------- Knöpfe ---------- */
+.cta{
+  display:block;width:100%;min-height:52px;margin-top:8px;
+  background:var(--stbd);color:#04150E;border:0;border-radius:var(--r);
+  font:inherit;font-weight:680;font-size:1rem;cursor:pointer;transition:filter .15s,opacity .15s;
+}
+.cta:hover{filter:brightness(1.08)}
+.cta:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.ghost{
+  display:block;width:100%;min-height:var(--tap);margin-top:8px;
+  background:none;color:var(--fog-dim);border:1px solid var(--line-soft);border-radius:var(--r);
+  font:inherit;font-size:.92rem;cursor:pointer;
+}
+.ghost:hover{color:var(--white-light);border-color:var(--line)}
+.ghost:disabled{opacity:.45;cursor:not-allowed}
+.ghost:disabled:hover{color:var(--fog-dim);border-color:var(--line-soft)}
+.ghost.danger:hover{color:var(--port);border-color:var(--port)}
+.ghost.brass{color:var(--brass);border-color:rgba(216,165,68,.45)}
+.ghost.brass:hover{border-color:var(--brass);color:var(--brass)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.textlink{background:none;border:0;padding:6px 0;margin-top:14px;color:var(--fog-dim);font:inherit;font-size:.85rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
+.textlink:hover{color:var(--white-light)}
+
+/* ---------- Fortschrittsbalken der Runde ---------- */
+.meter{height:3px;background:var(--line-soft);border-radius:2px;overflow:hidden;margin-bottom:22px}
+.meter i{display:block;height:100%;background:var(--stbd);width:0;transition:width .3s ease}
+
+/* ---------- Fragekopf ---------- */
+.plate-label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--fog-dim);margin:0 0 8px;font-family:var(--mono)}
+.plate-label .wdh{color:var(--brass)}
+.q-name{font-size:clamp(1.3rem,5.2vw,1.65rem);line-height:1.25;color:var(--white-light);font-weight:640;margin:0;letter-spacing:-.015em}
+
+.answer-area{margin-top:22px}
+textarea#antwort{
+  width:100%;min-height:140px;padding:12px 14px;
+  background:var(--sea-900);border:1px solid var(--line);border-radius:10px;
+  color:var(--white-light);font:inherit;font-size:1rem;line-height:1.55;
+  resize:vertical;display:block;
+}
+textarea#antwort::placeholder{color:#5B6E82}
+textarea#antwort:focus{border-color:var(--stbd);outline:none}
+textarea#antwort[readonly]{border-color:var(--line-soft);color:var(--fog);cursor:default;min-height:0;resize:none;overflow:hidden}
+.kbd-hint{margin:6px 0 0;font-size:.74rem;color:#5B6E82;text-align:right}
+
+.hint-note{
+  display:flex;gap:10px;align-items:flex-start;
+  margin:10px 0 0;padding:10px 12px;border-radius:10px;
+  background:linear-gradient(var(--brass-dim),var(--sea-850));border:1px solid rgba(216,165,68,.4);
+  font-size:.9rem;color:var(--fog);
+}
+.hint-note b{color:var(--brass);font-weight:640;flex:none}
+
+/* ---------- Rückmeldung ---------- */
+.verdict{
+  display:flex;align-items:flex-start;gap:12px;
+  margin-top:18px;padding:14px 12px 14px 14px;
+  border:1px solid var(--line-soft);border-radius:var(--r);background:var(--sea-850);
+}
+.verdict.ok{border-color:var(--stbd);background:linear-gradient(var(--stbd-dim),var(--sea-850))}
+.verdict.no{border-color:var(--port);background:linear-gradient(var(--port-dim),var(--sea-850))}
+.verdict.skip{border-color:var(--brass);background:linear-gradient(var(--brass-dim),var(--sea-850))}
+/* Die Lampe ist Sektorlicht, nicht blosser Punkt */
+.lamp{width:14px;height:14px;border-radius:50%;flex:none;margin-top:4px;background:var(--fog-dim)}
+.verdict.ok .lamp{background:var(--stbd);box-shadow:0 0 0 4px rgba(60,194,140,.16)}
+.verdict.no .lamp{background:var(--port);box-shadow:0 0 0 4px rgba(232,85,94,.16)}
+.verdict.skip .lamp{background:var(--brass);box-shadow:0 0 0 4px rgba(216,165,68,.16)}
+.verdict-text{flex:1;min-width:0}
+.verdict-head{margin:0;font-weight:660;color:var(--white-light);font-size:1rem}
+.verdict-head:focus{outline:none}
+.verdict-sub{margin:3px 0 0;font-size:.88rem;color:var(--fog-dim)}
+.verdict-sub b{color:var(--fog);font-weight:620}
+
+.sub-eyebrow{margin-top:22px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.chip{
+  font-size:.83rem;padding:5px 10px;border-radius:999px;
+  background:var(--sea-800);border:1px solid var(--line-soft);color:var(--fog);
+}
+.chip.hit{border-color:var(--stbd);color:var(--stbd);background:rgba(60,194,140,.08)}
+.chip.fehlt{opacity:.55}
+.chip i{font-style:normal;margin-right:5px}
+.chip .pf{font-family:var(--mono);color:var(--brass);margin-left:4px;font-size:.75rem}
+.chip.hit .pf{color:var(--stbd)}
+
+/* ---------- Musterlösung ---------- */
+.loesung{
+  background:var(--sea-850);border:1px solid var(--line-soft);border-left:3px solid var(--stbd);
+  border-radius:0 var(--r) var(--r) 0;padding:14px 16px;
+}
+.loesung p{margin:0;font-size:.95rem;color:var(--fog);line-height:1.6}
+.loesung ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.loesung li{font-size:.95rem;color:var(--fog);line-height:1.5}
+.loesung li::marker{color:var(--brass)}
+.anmerkung{margin:10px 0 0;font-size:.85rem;color:var(--brass);line-height:1.45}
+.anmerkung b{font-weight:640}
+
+/* ---------- Ergebnis ---------- */
+.score{font-size:clamp(2.8rem,14vw,3.8rem);line-height:1;color:var(--white-light);margin:10px 0 8px;font-weight:600}
+.tally{display:flex;align-items:baseline;gap:9px;margin:4px 0 6px;flex-wrap:wrap}
+.tally-num{font-family:var(--mono);font-size:1.5rem;color:var(--white-light);font-weight:600;line-height:1}
+.tally-pct{font-size:.9rem;color:var(--fog-dim)}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 26px}
+.fact{font-size:.8rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line-soft);color:var(--fog-dim);background:var(--sea-850)}
+.fact b{font-family:var(--mono);color:var(--white-light);font-weight:600;margin-right:4px}
+
+.misslist{margin:6px 0 24px;display:grid;gap:6px}
+.miss{
+  display:flex;gap:12px;align-items:baseline;padding:11px 13px;width:100%;text-align:left;
+  background:var(--sea-850);border:0;border-left:3px solid var(--port);border-radius:0 10px 10px 0;
+  color:var(--fog);font:inherit;cursor:pointer;
+}
+.miss:hover{background:var(--sea-800)}
+.miss.later{border-left-color:var(--brass)}
+.miss b{font-family:var(--mono);color:var(--white-light);flex:none;font-weight:600;min-width:2ch;text-align:right}
+.miss span{font-size:.9rem;color:var(--fog);line-height:1.35;flex:1;min-width:0}
+.miss small{display:block;font-size:.74rem;color:var(--fog-dim);margin-top:2px}
+.miss.later small{color:var(--brass)}
+
+/* ---------- Fragenliste ---------- */
+input#suche{
+  width:100%;min-height:var(--tap);padding:12px 14px;
+  background:var(--sea-900);border:1px solid var(--line);border-radius:10px;
+  color:var(--white-light);font:inherit;font-size:1rem;
+}
+input#suche::placeholder{color:#5B6E82}
+input#suche:focus{border-color:var(--stbd);outline:none}
+.such-zahl{margin:12px 0 14px;font-size:.8rem;color:var(--fog-dim);font-family:var(--mono)}
+.such-zeile{
+  display:flex;gap:12px;align-items:baseline;text-align:left;width:100%;
+  margin-bottom:8px;padding:13px 15px;
+  background:var(--sea-850);border:1px solid var(--line-soft);border-radius:var(--r);
+  color:var(--fog);cursor:pointer;font:inherit;transition:border-color .15s;
+}
+.such-zeile:hover{border-color:var(--line)}
+.such-zeile b{font-family:var(--mono);color:var(--fog-dim);font-weight:600;flex:none;min-width:2ch;text-align:right;font-size:.85rem}
+.such-zeile span{color:var(--white-light);font-size:.94rem;line-height:1.35}
+
+/* ---------- Panels ---------- */
+.sheet-wrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet-scrim{position:absolute;inset:0;background:rgba(4,9,15,.7);animation:fade .2s ease both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{
+  position:relative;width:100%;max-width:640px;max-height:88vh;
+  background:var(--sea-850);border:1px solid var(--line-soft);border-bottom:0;
+  border-radius:20px 20px 0 0;display:flex;flex-direction:column;
+  animation:slide .26s cubic-bezier(.22,.9,.3,1) both;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+@keyframes slide{from{transform:translateY(14px);opacity:.6}to{transform:none;opacity:1}}
+.sheet-grab{height:22px;flex:none;cursor:pointer;display:grid;place-items:center;background:none;border:0;width:100%}
+.sheet-grab::after{content:"";width:38px;height:4px;border-radius:2px;background:var(--line)}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:6px 16px 12px;border-bottom:1px solid var(--line-soft)}
+.sheet-head .plate-label{margin-bottom:4px}
+.sheet-head .h-section{font-size:1.02rem;line-height:1.35}
+.sheet-body{padding:16px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.sheet-body .loesung{background:var(--sea-900)}
+.sheet-body .eyebrow{font-size:.68rem;color:var(--fog-dim);margin:4px 0 10px}
+.sheet-body .eyebrow.sub-eyebrow{margin-top:22px}
+.eigene{margin:0 0 20px;padding:12px 14px;border-radius:10px;border:1px dashed var(--line);background:var(--sea-900);font-size:.92rem;color:var(--fog);white-space:pre-wrap}
+.eigene.leer{color:var(--fog-dim);font-style:italic}
+
+.help-h{color:var(--white-light);font-size:.95rem;margin:22px 0 6px;font-weight:640}
+.help-h:first-child{margin-top:0}
+.sheet-body p{margin:0 0 10px;font-size:.92rem;color:var(--fog-dim)}
+.sheet-body p strong{color:var(--fog)}
+.sheet-body .loesung p{color:var(--fog);margin:0}
+.keyline{border:0;border-top:1px solid var(--line-soft);margin:20px 0}
+.sheet-actions{padding:4px 16px 18px}
+
+/* ---------- Hinweis unten ---------- */
+.toast{
+  position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  z-index:60;background:var(--sea-700);border:1px solid var(--line);color:var(--white-light);
+  padding:11px 17px;border-radius:999px;font-size:.88rem;animation:fade .2s ease both;max-width:92vw;text-align:center;
+}
+
+@media (min-width:520px){
+  .choices.row4 .choice{padding:16px 6px}
+}
+@media (max-width:359px){
+  .choices.row4{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+/* ---------- Ergänzungen MARPOL-BSU&BSH ---------- */
+.q-name,#sheet-loesung-titel{white-space:pre-line}
+
+/* Bereichswahl: Zeilen mit Fragenzahl rechts */
+.choice.bereich{flex-direction:row;align-items:center;gap:12px}
+.choice.bereich .choice-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.choice-count{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--fog-dim);font-size:.95rem;flex:none}
+.choice.bereich[aria-checked="true"] .choice-count{color:var(--stbd)}
+
+/* Rundengrösse: Kacheln in variabler Zahl */
+.choices.sizes{grid-template-columns:repeat(var(--n,3),1fr)}
+.choices.sizes .choice{align-items:center;text-align:center;padding:14px 4px}
+.choices.sizes .choice-title{font-family:var(--mono);font-size:1.35rem;font-weight:600;line-height:1.1}
+
+/* Musterlösung mit Gliederung */
+.loesung > * + *{margin-top:10px}
+.loesung .lz-h{margin:0;color:var(--white-light);font-weight:640;font-size:.9rem;line-height:1.4}
+.loesung .lz-h2{margin:0;color:var(--fog);font-weight:640;font-size:.88rem;line-height:1.4}
+.loesung * + .lz-h{margin-top:16px}
+.loesung * + .lz-h2{margin-top:12px}
+.loesung .lz-h + *,.loesung .lz-h2 + *{margin-top:4px}
+.loesung ol{margin:0;padding-left:22px;display:grid;gap:6px}
+.loesung ol li{font-size:.95rem;color:var(--fog);line-height:1.5}
+.loesung ol li::marker{color:var(--brass);font-family:var(--mono)}
+
+/* Fragenliste: Filter und Lernstand */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px}
+.seg button{
+  min-height:var(--tap);padding:8px 6px;border-radius:10px;
+  background:var(--sea-850);border:1px solid var(--line-soft);color:var(--fog-dim);
+  font:inherit;font-size:.85rem;cursor:pointer;transition:border-color .15s,color .15s;
+}
+.seg button:hover{border-color:var(--line);color:var(--white-light)}
+.seg button[aria-pressed="true"]{border-color:var(--stbd);color:var(--white-light);background:var(--sea-800)}
+.such-zeile b{min-width:3ch}
+.such-zeile .zeile-text{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.such-zeile .zeile-text > span{color:var(--white-light);font-size:.94rem;line-height:1.35;white-space:pre-line}
+.such-zeile small{font-size:.74rem;color:var(--fog-dim);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--line)}
+.dot.ok{background:var(--stbd)}
+.dot.no{background:var(--port)}
+.dot.skip{background:var(--brass)}
+.miss b{min-width:3ch}
+
+.sheet-body p.help-h{color:var(--white-light);margin:22px 0 6px}
+.sheet-body p.help-h:first-child{margin-top:0}
+
+.lernstand-zeile{font-size:.85rem;color:var(--fog-dim);margin:0 0 8px}
+.lernstand-zeile b{font-family:var(--mono);color:var(--white-light);font-weight:600}
+</style>
+</head>
+<body>
+
+<a class="skiplink" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="top">
+  <div class="top-row">
+    <button class="icon-btn" id="btn-zurueck" type="button" title="Zurück" aria-label="Zurück" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <span class="brand">
+      <span class="brand-name">MARPOL-BSU&amp;BSH</span>
+      <span class="crumb" id="crumb">Prüfungsfragen</span>
+    </span>
+    <button class="icon-btn" id="btn-liste" type="button" title="Alle Fragen" aria-label="Alle Fragen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".6"/><circle cx="4.5" cy="12" r=".6"/><circle cx="4.5" cy="18" r=".6"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-info" type="button" title="Info" aria-label="Info">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>
+    </button>
+  </div>
+  <div class="horizon" aria-hidden="true"><i class="port"></i><i class="mast"></i><i class="stbd"></i></div>
+</header>
+
+<main id="inhalt">
+
+  <!-- ---------- Start ---------- -->
+  <section class="screen" id="screen-start">
+    <p class="eyebrow">Sportseeschifferschein · Schifffahrtsrecht</p>
+    <h1 class="h-display" id="start-titel">Fragen üben</h1>
+    <p class="lede">Prüfungsfragen zu MARPOL, Seeunfalluntersuchung und Schiffsdokumenten in zufälliger Reihenfolge. Antwort frei formulieren, prüfen lassen und mit der Musterlösung vergleichen. Falsche und gelöste Fragen kommen später nochmals.</p>
+
+    <p class="eyebrow" id="bereich-label">Bereich</p>
+    <div class="choices" id="bereich-choices" role="radiogroup" aria-labelledby="bereich-label"></div>
+
+    <p class="eyebrow" id="groesse-label">Rundengrösse</p>
+    <div class="choices sizes" id="groesse-choices" role="radiogroup" aria-labelledby="groesse-label"></div>
+
+    <button class="cta" id="btn-start" type="button">Runde starten</button>
+    <button class="ghost brass" id="btn-falsche" type="button">Nur bisher Falsche üben</button>
+    <button class="ghost" id="btn-liste-2" type="button">Alle Fragen ansehen</button>
+    <button class="textlink" id="btn-info-2" type="button">So wird bewertet</button>
+  </section>
+
+  <!-- ---------- Frage ---------- -->
+  <section class="screen" id="screen-frage" hidden>
+    <div class="meter" role="progressbar" aria-label="Fortschritt der Runde" aria-valuemin="0" aria-valuemax="100" id="meter"><i id="meter-fill"></i></div>
+
+    <p class="plate-label" id="frage-label">Frage</p>
+    <h2 class="q-name" id="frage-text" tabindex="-1"></h2>
+
+    <div class="answer-area">
+      <label class="sr-only" for="antwort">Ihre Antwort</label>
+      <textarea id="antwort" rows="6" placeholder="Antwort frei formulieren. Stichworte genügen, Fachbegriffe zählen." autocomplete="off" autocapitalize="sentences" spellcheck="true"></textarea>
+      <p class="kbd-hint" id="kbd-hint">Strg + Enter prüft</p>
+      <p class="hint-note" id="hinweis-note" hidden><b>Hinweis</b><span id="hinweis-text"></span></p>
+
+      <div id="frage-aktionen">
+        <button class="cta" id="btn-pruefen" type="button" disabled>Prüfen</button>
+        <div class="btn-row">
+          <button class="ghost" id="btn-hinweis" type="button">Hinweis</button>
+          <button class="ghost" id="btn-loesen" type="button">Lösen</button>
+        </div>
+        <button class="ghost" id="btn-ueberspringen" type="button">Überspringen</button>
+      </div>
+    </div>
+
+    <!-- Auswertung -->
+    <div id="auswertung" hidden>
+      <div class="verdict" id="verdict" aria-live="polite">
+        <span class="lamp" aria-hidden="true"></span>
+        <span class="verdict-text">
+          <p class="verdict-head" id="verdict-head" tabindex="-1"></p>
+          <p class="verdict-sub" id="verdict-sub"></p>
+        </span>
+      </div>
+      <button class="ghost brass" id="btn-doch" type="button" hidden>Doch richtig</button>
+
+      <p class="eyebrow sub-eyebrow">Schlüsselelemente</p>
+      <div class="chips" id="element-chips"></div>
+
+      <p class="eyebrow sub-eyebrow">Musterlösung</p>
+      <div class="loesung" id="loesung-box"></div>
+      <p class="anmerkung" id="loesung-anmerkung" hidden></p>
+
+      <button class="cta" id="btn-weiter" type="button" style="margin-top:22px">Weiter</button>
+    </div>
+  </section>
+
+  <!-- ---------- Ergebnis ---------- -->
+  <section class="screen" id="screen-ergebnis" hidden>
+    <p class="eyebrow" id="ergebnis-eyebrow">Runde beendet</p>
+    <h2 class="h-section">Ergebnis</h2>
+    <p class="score mono" id="ergebnis-score">0 %</p>
+    <div class="tally">
+      <span class="tally-num" id="ergebnis-zahl">0/0</span>
+      <span class="tally-pct">beim ersten Versuch richtig</span>
+    </div>
+    <div class="facts" id="ergebnis-facts"></div>
+    <p class="eyebrow" id="miss-eyebrow" hidden>Noch einmal ansehen</p>
+    <div class="misslist" id="misslist"></div>
+    <button class="cta" id="btn-fehler" type="button">Fehler nochmals üben</button>
+    <button class="ghost" id="btn-neu" type="button">Neue Runde</button>
+    <button class="ghost" id="btn-zum-start" type="button">Zur Startseite</button>
+  </section>
+
+  <!-- ---------- Alle Fragen ---------- -->
+  <section class="screen" id="screen-liste" hidden>
+    <p class="eyebrow">Ohne Abfrage</p>
+    <h2 class="h-section">Alle Fragen</h2>
+    <p class="lede">Sucht in Fragen und Musterlösungen. Antippen zeigt die Lösung. Der Punkt zeigt Ihr letztes Ergebnis.</p>
+    <div class="seg" id="filter" role="group" aria-label="Bereich filtern">
+      <button type="button" data-filter="alle" aria-pressed="true">Alle</button>
+      <button type="button" data-filter="marpol" aria-pressed="false">MARPOL</button>
+      <button type="button" data-filter="bsu" aria-pressed="false">BSU &amp; BSH</button>
+    </div>
+    <label class="sr-only" for="suche">Suchbegriff</label>
+    <input id="suche" type="search" placeholder="z. B. Sondergebiet, BSU, Flaggenzertifikat" autocomplete="off">
+    <p class="such-zahl" id="such-zahl" aria-live="polite"></p>
+    <div id="such-treffer"></div>
+  </section>
+
+</main>
+
+<!-- ---------- Panel: Lösung ---------- -->
+<div class="sheet-wrap" id="sheet-loesung" hidden>
+  <div class="sheet-scrim" data-schliessen></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-loesung-titel">
+    <button class="sheet-grab" type="button" data-schliessen aria-label="Schliessen"></button>
+    <div class="sheet-head">
+      <div>
+        <p class="plate-label" id="sheet-loesung-nr">Frage</p>
+        <h3 class="h-section" id="sheet-loesung-titel"></h3>
+      </div>
+      <button class="icon-btn" type="button" data-schliessen aria-label="Schliessen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body" id="sheet-loesung-body"></div>
+  </div>
+</div>
+
+<!-- ---------- Panel: Info ---------- -->
+<div class="sheet-wrap" id="sheet-info" hidden>
+  <div class="sheet-scrim" data-schliessen></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-info-titel">
+    <button class="sheet-grab" type="button" data-schliessen aria-label="Schliessen"></button>
+    <div class="sheet-head">
+      <div>
+        <p class="plate-label">Info</p>
+        <h3 class="h-section" id="sheet-info-titel">So funktioniert die App</h3>
+      </div>
+      <button class="icon-btn" type="button" data-schliessen aria-label="Schliessen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <p class="help-h">Bereiche und Runden</p>
+      <p><strong>MARPOL</strong>: alle 6 Fragen. <strong>BSU &amp; BSH</strong>: 10 Fragen oder alle 14. <strong>Gemischt</strong>: 10 Fragen (3 MARPOL + 7 BSU &amp; BSH), 15 Fragen (5 + 10) oder alle 20. Die Reihenfolge ist zufällig; sehr ähnliche Fragen kommen nicht direkt hintereinander.</p>
+
+      <p class="help-h">Bewertung</p>
+      <p>Jede Frage hat feste Schlüsselelemente. Die App sucht sie in Ihrer Antwort, auch in anderer Wortform, in zusammengesetzten Wörtern, als Abkürzung (z. B. BSU, BSH, IBS) und mit kleinen Tippfehlern. Umlaute, ß und Gross- und Kleinschreibung spielen keine Rolle.</p>
+      <p><strong>Richtig</strong>: alle Pflichtpunkte (★) und genügend Elemente erkannt. <strong>Teilweise</strong>: mindestens die Hälfte. <strong>Falsch</strong>: weniger.</p>
+      <p>Die Automatik erkennt Begriffe, keine Begründungen. Wenn sie sich irrt, werten Sie die Antwort mit „Doch richtig“ selbst.</p>
+
+      <p class="help-h">Wiederholung</p>
+      <p>Falsch beantwortet oder mit „Lösen“ aufgelöst: Die Frage kommt nach frühestens drei anderen Fragen wieder, höchstens zweimal. Danach bleibt sie offen.</p>
+      <p>Teilweise richtig oder übersprungen: keine Wiederholung in der Runde. Die Frage steht aber im Ergebnis unter „Noch einmal ansehen“ und ist in „Fehler nochmals üben“ enthalten.</p>
+
+      <p class="help-h">Lernstand</p>
+      <p>Die App merkt sich in diesem Browser das letzte Ergebnis jeder Frage. „Nur bisher Falsche üben“ stellt alle Fragen des gewählten Bereichs, die zuletzt nicht richtig beantwortet wurden.</p>
+      <p class="lernstand-zeile" id="lernstand-zeile"></p>
+      <button class="ghost danger" id="btn-lernstand-reset" type="button">Lernstand zurücksetzen</button>
+
+      <p class="help-h">Tastatur</p>
+      <p>Strg + Enter (Mac: Cmd + Enter) prüft die Antwort und geht danach weiter.</p>
+
+      <hr class="keyline">
+      <p class="help-h">Als App installieren</p>
+      <p><strong>iPhone/iPad</strong>: in Safari Teilen → „Zum Home-Bildschirm“. <strong>Android</strong>: in Chrome Menü → „App installieren“. <strong>Desktop</strong>: Installations-Symbol in der Adresszeile.</p>
+      <p id="offline-status"></p>
+
+      <hr class="keyline">
+      <p class="help-h">Datengrundlage</p>
+      <p>Fragensammlungen „MARPOL“ (6 Fragen) und „BSU/BSH“ (14 Fragen). Fragen und Musterlösungen sind wörtlich übernommen, mit diesen Ausnahmen:</p>
+      <p><strong>BSU &amp; BSH Nr. 8</strong>: Das Schiffszertifikat stellt das Registergericht (Amtsgericht) aus, nicht das BSH (§ 60 SchRegO). Den Internationalen Bootsschein stellt auch der ADAC aus.</p>
+      <p><strong>BSU &amp; BSH Nr. 14</strong>: Die Registerpflicht gilt erst bei einer Rumpflänge von mehr als 15 m (§ 10 SchRegO); Merkhilfe angepasst.</p>
+      <p><strong>BSU &amp; BSH Nr. 2</strong>: Ein Punkt zur Bewegung der Wasserteilchen in der brechenden Welle ist ergänzt.</p>
+      <p>Formatfehler bereinigt in BSU &amp; BSH Nr. 12 und MARPOL Nr. 3 und 6. Die Hinweise sind für diese App neu formuliert.</p>
+      <p>Kein Server, keine Anmeldung, keine Übertragung. Gespeichert werden nur Ihre letzte Einstellung und der Lernstand in diesem Browser.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Panel: Runde beenden ---------- -->
+<div class="sheet-wrap" id="sheet-beenden" hidden>
+  <div class="sheet-scrim" data-schliessen></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-beenden-titel">
+    <button class="sheet-grab" type="button" data-schliessen aria-label="Schliessen"></button>
+    <div class="sheet-head">
+      <div>
+        <p class="plate-label">Runde</p>
+        <h3 class="h-section" id="sheet-beenden-titel">Runde beenden?</h3>
+      </div>
+    </div>
+    <div class="sheet-body">
+      <p>Bisherige Antworten werden ausgewertet. Nicht gestellte Fragen zählen nicht mit.</p>
+      <button class="cta" id="btn-beenden-ja" type="button">Beenden und auswerten</button>
+      <button class="ghost" type="button" data-schliessen>Weiter üben</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script id="fragen-daten" type="application/json">
+[
+  {
+    "id": "m01",
+    "bereich": "marpol",
+    "nummer": 1,
+    "gruppe": "sondergebiete",
+    "frage": "Nennen Sie als Sondergebiete bezeichnete europäische Meeresgebiete im Sinne von MARPOL 73/78.",
+    "loesung": [
+      {
+        "p": "Nordsee, Ostsee, Mittelmeer, Schwarzes Meer."
+      }
+    ],
+    "hinweis": "Vier Meere rund um Europa: zwei im Norden, zwei im Süden.",
+    "mindestanzahl": 3,
+    "elemente": [
+      {
+        "label": "Nordsee",
+        "treffer": [
+          "nordsee",
+          "north sea"
+        ]
+      },
+      {
+        "label": "Ostsee",
+        "treffer": [
+          "ostsee",
+          "~ostsee",
+          "baltische see",
+          "baltic"
+        ]
+      },
+      {
+        "label": "Mittelmeer",
+        "treffer": [
+          "mittelmeer",
+          "mediterran"
+        ]
+      },
+      {
+        "label": "Schwarzes Meer",
+        "treffer": [
+          "schwarze meer",
+          "schwarzes meer",
+          "schwarzmeer",
+          "black sea"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m02",
+    "bereich": "marpol",
+    "nummer": 2,
+    "frage": "Dürfen folgende Müllarten in Sondergebieten beseitigt werden und wenn ja, unter welchen Bedingungen?\n• Lebensmittelabfälle\n• leere Bierflaschen\n• Verpackungsmaterial (z.B. Flaschenkartons)\n• Kunststoffmülltüten vom Lebensmitteleinkauf",
+    "loesung": [
+      {
+        "h": "Lebensmittel:"
+      },
+      {
+        "p": "Beseitigung erlaubt, zerkleinert oder gemahlen, im Abstand > 12 sm von der nächstgelegenen Küste entfernt."
+      },
+      {
+        "h": "Glas, Verpackungsmaterial und Plastik:"
+      },
+      {
+        "p": "Beseitigung ist nicht erlaubt."
+      }
+    ],
+    "hinweis": "Nur eine der vier Müllarten darf über Bord, und auch die nur unter zwei Bedingungen.",
+    "mindestanzahl": 2,
+    "elemente": [
+      {
+        "label": "Lebensmittel zerkleinert oder gemahlen",
+        "treffer": [
+          "zerkleiner",
+          "gemahlen",
+          "zermahlen",
+          "mahlen",
+          "gehäckselt",
+          "püriert",
+          "#25-25"
+        ]
+      },
+      {
+        "label": "Abstand > 12 sm zur Küste",
+        "pflicht": true,
+        "treffer": [
+          "#12-12",
+          "=zwoelf",
+          "^12sm",
+          "^12nm"
+        ]
+      },
+      {
+        "label": "Glas, Verpackung, Plastik verboten",
+        "pflicht": true,
+        "verneinend": true,
+        "treffer": [
+          "^verbot",
+          "untersagt",
+          "nicht erlaubt",
+          "nicht zulässig",
+          "nicht gestattet",
+          "nicht beseitigt",
+          "nicht entsorgt",
+          "nicht über bord",
+          "darf nicht",
+          "dürfen nicht",
+          "glas nicht",
+          "flaschen nicht",
+          "verpackung nicht",
+          "plastik nicht",
+          "kunststoff nicht",
+          "an land",
+          "im hafen",
+          "mitnehmen",
+          "aufbewahren",
+          "=nein"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m03",
+    "bereich": "marpol",
+    "nummer": 3,
+    "gruppe": "sondergebiete",
+    "frage": "Der Begriff MARPOL steht im weitesten Sinne für Umweltschutz. Erläutern Sie die Bedeutung von MARPOL. Nennen Sie:\n1. gem. MARPOL eingerichteten Sondergebiete in Nordeuropa\n2. für diese Gebiete zu beachtenden Vorschriften hinsichtlich des Einleitens von Öl, Schadstoffen und Schiffsmüll\n3. wie in Sondergebieten mit Lebensmittelabfällen zu verfahren ist.",
+    "loesung": [
+      {
+        "p": "MARPOL: Internationales Übereinkommen zum Schutz der Meere vor Verschmutzung."
+      },
+      {
+        "ul": [
+          "Sondergebiete Nordeuropa: Nordsee und Ostsee.",
+          "Verboten: Einleiten von Öl, Schadstoffen und Schiffsmüll.",
+          "Lebensmittelabfälle: Nur ab 12 sm Abstand zur Küste über Bord zulässig."
+        ]
+      }
+    ],
+    "hinweis": "Ein internationales Abkommen, zwei nördliche Meere, ein Verbot und eine Abstandsregel.",
+    "mindestanzahl": 4,
+    "elemente": [
+      {
+        "label": "Übereinkommen zum Schutz der Meere vor Verschmutzung",
+        "pflicht": true,
+        "treffer": [
+          "übereinkommen",
+          "abkommen",
+          "konvention",
+          "vertrag",
+          "^verschmutz",
+          "meeresschutz",
+          "schutz der meere",
+          "schutz des meeres",
+          "meeresumwelt",
+          "pollution"
+        ]
+      },
+      {
+        "label": "Nordsee",
+        "treffer": [
+          "nordsee"
+        ]
+      },
+      {
+        "label": "Ostsee",
+        "treffer": [
+          "ostsee",
+          "~ostsee"
+        ]
+      },
+      {
+        "label": "Einleiten verboten",
+        "verneinend": true,
+        "treffer": [
+          "^verbot",
+          "untersagt",
+          "nicht einleiten",
+          "nicht erlaubt",
+          "nicht gestattet",
+          "nicht zulässig",
+          "keine einleitung",
+          "nichts einleiten",
+          "nichts über bord",
+          "darf nicht",
+          "dürfen nicht"
+        ]
+      },
+      {
+        "label": "Lebensmittelabfälle ab 12 sm",
+        "pflicht": true,
+        "treffer": [
+          "#12-12",
+          "=zwoelf",
+          "^12sm",
+          "^12nm"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m04",
+    "bereich": "marpol",
+    "nummer": 4,
+    "frage": "Beschreiben Sie den Zweck und die Aufgaben des MARPOL-Abkommens.",
+    "loesung": [
+      {
+        "h": "Zweck:"
+      },
+      {
+        "p": "Das MARPOL-Abkommen dient dem Schutz der Meeresumwelt vor Verschmutzungen durch die Schifffahrt, sowohl aus dem normalen Schiffsbetrieb als auch infolge von Unfällen."
+      },
+      {
+        "h": "Aufgaben:"
+      },
+      {
+        "p": "Die Aufgaben bestehen in der Festlegung und Umsetzung von Vorschriften zur Vermeidung von Meeresverschmutzungen, insbesondere bezüglich:"
+      },
+      {
+        "ul": [
+          "Öl",
+          "Chemikalien",
+          "Abwasser",
+          "Müll",
+          "Luftverschmutzung",
+          "Meldepflichten und Schutzgebieten"
+        ]
+      },
+      {
+        "p": "Diese Anforderungen sind in den sechs MARPOL-Anlagen (Annexe I bis VI) geregelt."
+      }
+    ],
+    "hinweis": "Wovor wird die Meeresumwelt geschützt, und für welche Stoffe gibt es eigene Anlagen?",
+    "mindestanzahl": 5,
+    "elemente": [
+      {
+        "label": "Schutz der Meeresumwelt vor Verschmutzung",
+        "pflicht": true,
+        "treffer": [
+          "^verschmutz",
+          "meeresumwelt",
+          "meeresschutz",
+          "umweltschutz",
+          "schutz der meere",
+          "schutz des meeres",
+          "reinhaltung",
+          "pollution"
+        ]
+      },
+      {
+        "label": "Durch Schiffsbetrieb und Unfälle",
+        "treffer": [
+          "schiffsbetrieb",
+          "betrieb",
+          "^unfall",
+          "unfaelle",
+          "havarie",
+          "schifffahrt",
+          "schiffe"
+        ]
+      },
+      {
+        "label": "Vorschriften festlegen und umsetzen",
+        "treffer": [
+          "vorschrift",
+          "^regeln",
+          "regelung",
+          "^regelt",
+          "festlegung",
+          "umsetzung",
+          "standards",
+          "grenzwert",
+          "^norm"
+        ]
+      },
+      {
+        "label": "Öl",
+        "treffer": [
+          "^oel"
+        ]
+      },
+      {
+        "label": "Chemikalien",
+        "treffer": [
+          "chemikal",
+          "schadstoff",
+          "flüssige stoffe",
+          "gefährliche stoffe",
+          "schädliche stoffe",
+          "gefahrgut"
+        ]
+      },
+      {
+        "label": "Abwasser",
+        "treffer": [
+          "abwasser",
+          "fäkal",
+          "toilette",
+          "schwarzwasser",
+          "sewage"
+        ]
+      },
+      {
+        "label": "Müll",
+        "treffer": [
+          "muell",
+          "abfall",
+          "abfael",
+          "garbage"
+        ]
+      },
+      {
+        "label": "Luftverschmutzung",
+        "treffer": [
+          "luft",
+          "abgas",
+          "emission",
+          "schwefel",
+          "stickoxid",
+          "treibhaus"
+        ]
+      },
+      {
+        "label": "Sechs Anlagen (Annex I–VI)",
+        "treffer": [
+          "anlage",
+          "annex",
+          "=sechs",
+          "=6"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m05",
+    "bereich": "marpol",
+    "nummer": 5,
+    "frage": "Was sind Sondergebiete im Sinne des MARPOL?",
+    "loesung": [
+      {
+        "p": "Sondergebiete sind geografisch klar abgegrenzte Meeresgebiete, die aufgrund ihrer ökologischen Bedeutung oder ihrer besonderen Empfindlichkeit gegenüber Meeresverschmutzungen einen erhöhten Schutz benötigen."
+      },
+      {
+        "p": "In diesen Gebieten gelten verschärfte Vorschriften für das Einleiten von Schadstoffen."
+      }
+    ],
+    "hinweis": "Bestimmte Meeresgebiete mit besonderem Schutzbedarf. Was gilt dort?",
+    "mindestanzahl": 2,
+    "elemente": [
+      {
+        "label": "Klar abgegrenzte Meeresgebiete",
+        "treffer": [
+          "abgegrenzt",
+          "begrenzt",
+          "geografisch",
+          "geographisch",
+          "definiert",
+          "festgelegt",
+          "ausgewiesen",
+          "bestimmte meeresgebiete",
+          "bestimmte gebiete",
+          "bestimmte seegebiete"
+        ]
+      },
+      {
+        "label": "Ökologisch bedeutend, besonders empfindlich",
+        "treffer": [
+          "oekolog",
+          "empfindlich",
+          "schutzbedürftig",
+          "schutzbeduerft",
+          "sensibel",
+          "schützenswert",
+          "schutzwürdig",
+          "erhöhten schutz",
+          "besonderen schutz",
+          "verletzlich",
+          "meeresumwelt"
+        ]
+      },
+      {
+        "label": "Verschärfte Vorschriften für das Einleiten",
+        "pflicht": true,
+        "treffer": [
+          "verschärft",
+          "streng",
+          "schärfer",
+          "^verbot",
+          "eingeschränkt",
+          "beschränkt",
+          "einschränk",
+          "besondere vorschriften",
+          "besondere regeln",
+          "untersagt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m06",
+    "bereich": "marpol",
+    "nummer": 6,
+    "gruppe": "sondergebiete",
+    "frage": "Welche europäischen Gewässer sind nach MARPOL als Sondergebiete ausgewiesen, und welche besonderen Vorschriften gelten dort?",
+    "loesung": [
+      {
+        "h": "Europäische MARPOL-Sondergebiete:"
+      },
+      {
+        "ul": [
+          "Ostsee",
+          "Nordsee",
+          "Mittelmeer",
+          "Schwarzes Meer"
+        ]
+      },
+      {
+        "p": "Die nach MARPOL ausgewiesenen europäischen Sondergebiete sind die Ostsee, Nordsee, das Mittelmeer und das Schwarze Meer. Aufgrund ihrer besonderen Schutzbedürftigkeit gelten dort verschärfte Vorschriften zur Verhinderung von Meeresverschmutzung, insbesondere für die Einleitung von Öl, Schadstoffen, Abwasser und Müll."
+      },
+      {
+        "h": "Besondere Vorschriften:"
+      },
+      {
+        "h2": "Ostsee:"
+      },
+      {
+        "p": "Sondergebiet nach MARPOL-Anlagen I (Öl), II (schädliche flüssige Stoffe), IV (Abwasser), V (Müll) und VI (Luftverschmutzung). Das Einleiten von Öl, Schadstoffen, Abwasser und Müll ist stark eingeschränkt oder verboten."
+      },
+      {
+        "h2": "Nordsee:"
+      },
+      {
+        "p": "Sondergebiet nach Anlage V (Müll). Die Entsorgung von Müll ins Meer unterliegt besonders strengen Vorschriften."
+      },
+      {
+        "h2": "Mittelmeer:"
+      },
+      {
+        "p": "Sondergebiet nach Anlage V (Müll). Das Einleiten von Müll ist stark eingeschränkt."
+      },
+      {
+        "h2": "Schwarzes Meer:"
+      },
+      {
+        "p": "Sondergebiet nach Anlage V (Müll). Es gelten ähnliche Vorschriften wie im Mittelmeer."
+      }
+    ],
+    "hinweis": "Zwei Meere im Norden, zwei im Süden. Eine Abfallart ist überall besonders streng geregelt.",
+    "mindestanzahl": 5,
+    "elemente": [
+      {
+        "label": "Ostsee",
+        "treffer": [
+          "ostsee",
+          "~ostsee",
+          "baltic"
+        ]
+      },
+      {
+        "label": "Nordsee",
+        "treffer": [
+          "nordsee",
+          "north sea"
+        ]
+      },
+      {
+        "label": "Mittelmeer",
+        "treffer": [
+          "mittelmeer",
+          "mediterran"
+        ]
+      },
+      {
+        "label": "Schwarzes Meer",
+        "treffer": [
+          "schwarze meer",
+          "schwarzes meer",
+          "schwarzmeer",
+          "black sea"
+        ]
+      },
+      {
+        "label": "Verschärfte Vorschriften",
+        "pflicht": true,
+        "treffer": [
+          "verschärft",
+          "streng",
+          "schärfer",
+          "^verbot",
+          "eingeschränkt",
+          "beschränkt",
+          "einschränk",
+          "untersagt"
+        ]
+      },
+      {
+        "label": "Müll (Anlage V)",
+        "treffer": [
+          "muell",
+          "abfall",
+          "abfael",
+          "anlage v",
+          "annex v",
+          "garbage"
+        ]
+      },
+      {
+        "label": "Ostsee zusätzlich Öl, Abwasser, Luft",
+        "treffer": [
+          "^oel",
+          "abwasser",
+          "luft",
+          "abgas",
+          "schadstoff",
+          "chemikal"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b01",
+    "bereich": "bsu",
+    "nummer": 1,
+    "frage": "Welche Pflichten ergeben sich für Sie als Führer einer Yacht aus den Grundregeln für das Verhalten im Verkehr und in Bezug auf die Verantwortlichkeit an Bord?",
+    "loesung": [
+      {
+        "h": "Grundregeln / Verantwortlichkeit (SeeSchStrO §§ 3,4):"
+      },
+      {
+        "ul": [
+          "Sicherheit und Leichtigkeit des Verkehrs gewährleisten.",
+          "Andere nicht schädigen, gefährden oder mehr als unvermeidlich behindern oder belästigen.",
+          "Alle Vorsichtsmaßnahmen treffen, welche Seemannsbrauch oder die besonderen Umstände des Falles erfordern.",
+          "Der Fahrzeugführer muss die Befolgung aller Vorschriften sicherstellen (Ausrüstung, Lichterführung, Sichtzeichen, Verhalten im Verkehr).",
+          "Abweichen von den Vorschriften zur Abwendung einer unmittelbar drohenden Gefahr.",
+          "Körperlich und geistig fit sein, wer unter dem Einfluss von Alkohol oder Drogen steht, darf kein Fahrzeug führen, es gilt die 0,5 Promille Grenze.",
+          "Der Schiffsführer muss vor Antritt der Reise bestimmt werden."
+        ]
+      }
+    ],
+    "hinweis": "Der Verkehr, die anderen, die Vorschriften, der Notfall und Ihr eigener Zustand.",
+    "mindestanzahl": 4,
+    "elemente": [
+      {
+        "label": "Sicherheit und Leichtigkeit des Verkehrs",
+        "treffer": [
+          "sicherheit",
+          "leichtigkeit",
+          "sicher fahren",
+          "verkehr sicher"
+        ]
+      },
+      {
+        "label": "Andere nicht schädigen, gefährden, behindern",
+        "pflicht": true,
+        "verneinend": true,
+        "treffer": [
+          "schaedig",
+          "gefaehrd",
+          "behinder",
+          "belaestig",
+          "niemanden",
+          "andere nicht"
+        ]
+      },
+      {
+        "label": "Vorsichtsmassnahmen nach Seemannsbrauch",
+        "treffer": [
+          "vorsicht",
+          "seemannsbrauch",
+          "seemännisch",
+          "seemannschaft",
+          "besonderen umstände"
+        ]
+      },
+      {
+        "label": "Befolgung der Vorschriften sicherstellen",
+        "treffer": [
+          "vorschrift",
+          "befolg",
+          "einhalten",
+          "einhaltung",
+          "beachten",
+          "ausrüstung",
+          "lichterführung",
+          "lichterfuehrung",
+          "sichtzeichen",
+          "^regeln"
+        ]
+      },
+      {
+        "label": "Abweichen zur Abwendung unmittelbarer Gefahr",
+        "treffer": [
+          "abweichen",
+          "abweichung",
+          "abwendung",
+          "abwenden",
+          "unmittelbar",
+          "drohende gefahr",
+          "gefahr abwenden",
+          "notfall"
+        ]
+      },
+      {
+        "label": "Fit, kein Alkohol oder Drogen, 0,5 Promille",
+        "verneinend": true,
+        "treffer": [
+          "alkohol",
+          "drogen",
+          "promille",
+          "rauschmittel",
+          "nuechtern",
+          "=fit",
+          "fahrtüchtig",
+          "fahrtauglich",
+          "koerperlich",
+          "geistig",
+          "medikament"
+        ]
+      },
+      {
+        "label": "Schiffsführer vor Reiseantritt bestimmen",
+        "treffer": [
+          "vor antritt",
+          "reiseantritt",
+          "vor der reise",
+          "bestimmt",
+          "bestimmen",
+          "festlegen",
+          "festgelegt",
+          "benennen",
+          "verantwortlichen"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b02",
+    "bereich": "bsu",
+    "nummer": 2,
+    "frage": "Beschreiben Sie die Bewegung der Wasserteilchen in einer brechenden Welle! Warum kann eine Yacht auch in nicht brechenden Wellen querschlagen?",
+    "loesung": [
+      {
+        "ul": [
+          "Brechende Welle: Wird die Welle zu steil (z. B. in flachem Wasser oder bei Wind gegen Strom), bewegen sich die Wasserteilchen am Kamm schneller als die Welle selbst. Der Kamm kippt nach vorn über, und das Wasser stürzt mit grosser Wucht in Wellenrichtung.",
+          "Orbitalbewegung: Wasserteilchen bewegen sich bei einer Welle auf kreisförmigen (tiefes Wasser) bzw. elliptischen Bahnen (flaches Wasser).",
+          "Orbitalstrom: Am Wellenberg bewegt sich das Wasser in Wellenrichtung, im Wellental entgegen der Wellenrichtung.",
+          "Querschlagen: Befindet sich das Heck auf dem Wellenberg und der Bug im Wellental, wird das Heck angeschoben und der Bug gebremst. Dadurch kann die Yacht drehen und quer zur Welle geraten, auch wenn die Welle nicht bricht."
+        ]
+      }
+    ],
+    "hinweis": "Kreisbahnen der Wasserteilchen. Und was passiert mit Heck und Bug am Wellenhang?",
+    "mindestanzahl": 3,
+    "elemente": [
+      {
+        "label": "Orbitalbewegung auf Kreis- oder Ellipsenbahnen",
+        "pflicht": true,
+        "treffer": [
+          "orbital",
+          "kreis",
+          "ellips",
+          "elliptisch",
+          "walze",
+          "rollbewegung"
+        ]
+      },
+      {
+        "label": "Am Wellenberg mit, im Tal gegen die Wellenrichtung",
+        "treffer": [
+          "wellenberg",
+          "wellenkamm",
+          "wellental",
+          "entgegen",
+          "gegenrichtung",
+          "rückwärts",
+          "zurück"
+        ]
+      },
+      {
+        "label": "Brechen: Kamm schneller als Welle, kippt über",
+        "treffer": [
+          "schneller",
+          "überholt",
+          "kippt",
+          "kippen",
+          "überschlägt",
+          "stürzt",
+          "bricht",
+          "brecher",
+          "vornüber",
+          "nach vorn",
+          "nach vorne",
+          "zu steil",
+          "steil"
+        ]
+      },
+      {
+        "label": "Querschlagen: Heck angeschoben, Bug gebremst",
+        "pflicht": true,
+        "treffer": [
+          "=heck",
+          "^heck",
+          "=bug",
+          "angeschoben",
+          "anschieb",
+          "schiebt",
+          "^gebrems",
+          "abgebremst",
+          "bremst"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b03",
+    "bereich": "bsu",
+    "nummer": 3,
+    "frage": "Sie wollen als Schiffsführer mit Freunden einen längeren Segeltörn durch die Biskaya ins Mittelmeer antreten, bei dem nachts nicht immer ein Hafen angelaufen werden kann. Wie kommen Sie Ihrer verkehrsrechtlichen Verantwortung einschließlich Schiffsführung und Wachdienst nach? (stichwortartige Aufzählung genügt!)",
+    "loesung": [
+      {
+        "ol": [
+          "Vor Antritt der Reise ist festzulegen, wer verantwortlicher Fahrzeugführer ist.",
+          "Da abends kein Hafen angelaufen wird, muss mindestens ein qualifiziertes Besatzungsmitglied die Seewache übernehmen. Der Schiffsführer hat die Qualifikation zu prüfen.",
+          "Eine ordentliche Wachübergabe ist erforderlich: Position, Kurs, Fahrt der Yacht, andere Fahrzeuge und die vorgeschriebene Lichtführung sind zu übergeben. Wachwechsel sind im Logbuch zu vermerken.",
+          "Falls der Schiffsführer nicht selbst wacht, ist er bei besonderen Ereignissen unverzüglich vom Wachgänger zu informieren."
+        ]
+      }
+    ],
+    "hinweis": "Wer führt, wer wacht, wie wird übergeben, und wann wird der Skipper geweckt?",
+    "mindestanzahl": 4,
+    "elemente": [
+      {
+        "label": "Verantwortlichen Fahrzeugführer vor Reiseantritt festlegen",
+        "pflicht": true,
+        "treffer": [
+          "fahrzeugführer",
+          "fahrzeugfuehrer",
+          "verantwortlich",
+          "vor antritt",
+          "reiseantritt",
+          "vor der reise",
+          "festlegen",
+          "festgelegt",
+          "bestimmen",
+          "benennen",
+          "skipper bestimmen"
+        ]
+      },
+      {
+        "label": "Qualifizierte Seewache einteilen",
+        "pflicht": true,
+        "treffer": [
+          "seewache",
+          "^wach",
+          "wachdienst",
+          "wachplan",
+          "wachgänger"
+        ]
+      },
+      {
+        "label": "Qualifikation prüfen",
+        "treffer": [
+          "qualifi",
+          "befähigt",
+          "befaehig",
+          "erfahren",
+          "kompetent",
+          "geeignet",
+          "prüfen"
+        ]
+      },
+      {
+        "label": "Ordentliche Wachübergabe",
+        "treffer": [
+          "übergabe",
+          "übergeben",
+          "wachwechsel",
+          "position",
+          "^kurs",
+          "lichtführung",
+          "lichterführung",
+          "verkehrslage",
+          "andere fahrzeuge"
+        ]
+      },
+      {
+        "label": "Wachwechsel im Logbuch vermerken",
+        "treffer": [
+          "logbuch",
+          "=log",
+          "eintragen",
+          "eintrag",
+          "vermerk",
+          "dokumentier",
+          "notieren"
+        ]
+      },
+      {
+        "label": "Schiffsführer bei besonderen Ereignissen informieren",
+        "treffer": [
+          "informier",
+          "wecken",
+          "geweckt",
+          "benachrichtig",
+          "bescheid",
+          "verständig",
+          "^ereignis",
+          "^vorkommnis",
+          "melden"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b04",
+    "bereich": "bsu",
+    "nummer": 4,
+    "frage": "Welche Gesetze und Verordnungen enthalten Vorschriften über das Verhalten nach einem Zusammenstoß? (Aufzählung genügt!)",
+    "loesung": [
+      {
+        "ul": [
+          "Seesicherheits-Untersuchungs-Gesetz (SUG)",
+          "Verordnung über die Sicherung der Seefahrt (SeeFSichV)",
+          "Seeschifffahrtsstraßen-Ordnung (SeeSchStrO)"
+        ]
+      }
+    ],
+    "hinweis": "Drei Regelwerke: eins zur Untersuchung, eins zur Sicherung der Seefahrt, eins zum Verkehr.",
+    "mindestanzahl": 2,
+    "elemente": [
+      {
+        "label": "Seesicherheits-Untersuchungs-Gesetz (SUG)",
+        "treffer": [
+          "=sug",
+          "seesicherheits",
+          "untersuchungsgesetz",
+          "untersuchungs gesetz"
+        ]
+      },
+      {
+        "label": "Verordnung über die Sicherung der Seefahrt (SeeFSichV)",
+        "treffer": [
+          "seefsichv",
+          "sicherung der seefahrt",
+          "sicherung seefahrt",
+          "seefahrtssicherung",
+          "sicherungsverordnung"
+        ]
+      },
+      {
+        "label": "Seeschifffahrtsstrassen-Ordnung (SeeSchStrO)",
+        "treffer": [
+          "seeschstro",
+          "seeschifffahrtsstrassen",
+          "seeschiffahrtsstrassen",
+          "schifffahrtsstrassen",
+          "seeschifffahrtsstrassenordnung"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b05",
+    "bereich": "bsu",
+    "nummer": 5,
+    "frage": "Was ist ein Seeunfall im Sinne des Seesicherheits-Untersuchungs-Gesetzes – SUG?",
+    "loesung": [
+      {
+        "h": "Seeunfall (§ 1a SUG)"
+      },
+      {
+        "p": "a) Jedes Ereignis mit mindestens einer der folgenden Folgen:"
+      },
+      {
+        "ul": [
+          "Tod oder schwere Verletzung eines Menschen",
+          "Verschwinden einer Person von Bord",
+          "Verlust oder Aufgabe eines Schiffes",
+          "Sachschaden an einem Schiff",
+          "Grundberührung, Schiffbruch oder Kollision",
+          "Durch den Schiffsbetrieb verursachter Sachschaden",
+          "Umweltschaden durch ein oder mehrere Schiffe"
+        ]
+      },
+      {
+        "p": "b) Jedes Ereignis im Zusammenhang mit dem Betrieb eines Schiffes,"
+      },
+      {
+        "ul": [
+          "durch das Menschen oder Schiffe in Gefahr geraten oder",
+          "das zu schweren Schäden an Schiffen, Bauwerken oder der Umwelt führen könnte."
+        ]
+      }
+    ],
+    "hinweis": "Zwei Teile: tatsächliche Folgen für Mensch, Schiff und Umwelt, und Ereignisse, die gefährlich werden könnten.",
+    "mindestanzahl": 4,
+    "elemente": [
+      {
+        "label": "Tod oder schwere Verletzung",
+        "treffer": [
+          "=tod",
+          "=tote",
+          "=toter",
+          "toedlich",
+          "verletz",
+          "verstorben",
+          "sterben"
+        ]
+      },
+      {
+        "label": "Verschwinden einer Person von Bord",
+        "treffer": [
+          "verschwind",
+          "verschwunden",
+          "verschollen",
+          "vermisst",
+          "über bord"
+        ]
+      },
+      {
+        "label": "Verlust oder Aufgabe eines Schiffes",
+        "treffer": [
+          "verlust",
+          "aufgabe",
+          "aufgegeben",
+          "^verlass",
+          "untergang",
+          "sinken",
+          "gesunken"
+        ]
+      },
+      {
+        "label": "Sachschaden an einem Schiff",
+        "treffer": [
+          "sachschaden",
+          "schaden",
+          "beschaedig"
+        ]
+      },
+      {
+        "label": "Grundberührung, Schiffbruch, Kollision",
+        "treffer": [
+          "grundberühr",
+          "auf grund",
+          "aufgrundlaufen",
+          "strandung",
+          "gestrandet",
+          "schiffbruch",
+          "kollision",
+          "zusammenstoss",
+          "festkommen",
+          "grundsitz"
+        ]
+      },
+      {
+        "label": "Umweltschaden",
+        "treffer": [
+          "umwelt",
+          "verschmutz",
+          "^oel"
+        ]
+      },
+      {
+        "label": "Ereignis mit Gefahr für Menschen oder Schiffe",
+        "treffer": [
+          "gefahr",
+          "gefaehrd",
+          "gefährlich",
+          "beinahe",
+          "drohen",
+          "drohend",
+          "risiko",
+          "könnte",
+          "koennte"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b06",
+    "bereich": "bsu",
+    "nummer": 6,
+    "frage": "Sie kollidieren bei diesigem Wetter auf der Weser bei Bremerhaven mit einer anderen Yacht. Während Ihre Yacht nahezu unbeschädigt bleibt, scheint die andere Yacht zu sinken. Was ist in dieser Situation von den an der Kollision beteiligten Fahrzeugen nach SeeSchStrO zu unternehmen?",
+    "loesung": [
+      {
+        "ol": [
+          "Die sinkende Yacht möglichst so weit aus dem Fahrwasser schaffen, dass die Schifffahrt nicht beeinträchtigt wird.",
+          "Ist die Schifffahrt beeinträchtigt, unverzüglich das WSA oder die Verkehrszentrale unterrichten.",
+          "Den Ort der gesunkenen Yacht unverzüglich behelfsmäßig bezeichnen."
+        ]
+      },
+      {
+        "p": "Zu 1. und 3. ist auch der Führer der schwimmfähig gebliebenen Yacht verpflichtet. Er darf erst nach Genehmigung des WSA weiterfahren. (§ 37 SeeSchStrO)"
+      }
+    ],
+    "hinweis": "Wohin mit der sinkenden Yacht, wen informieren Sie, und wann dürfen Sie selbst weiterfahren?",
+    "mindestanzahl": 3,
+    "elemente": [
+      {
+        "label": "Sinkende Yacht aus dem Fahrwasser schaffen",
+        "pflicht": true,
+        "treffer": [
+          "fahrwasser",
+          "aus dem weg",
+          "beiseite",
+          "an den rand",
+          "schleppen",
+          "abschleppen",
+          "flaches wasser",
+          "seitenraum"
+        ]
+      },
+      {
+        "label": "WSA oder Verkehrszentrale unterrichten",
+        "treffer": [
+          "=wsa",
+          "wasserstrassen",
+          "schifffahrtsamt",
+          "schiffahrtsamt",
+          "verkehrszentrale",
+          "revierzentrale",
+          "=vts",
+          "behörde",
+          "bremerhaven weser traffic",
+          "weser traffic"
+        ]
+      },
+      {
+        "label": "Ort der gesunkenen Yacht behelfsmässig bezeichnen",
+        "pflicht": true,
+        "treffer": [
+          "bezeichn",
+          "markier",
+          "kennzeichn",
+          "boje",
+          "fender",
+          "wrackstelle",
+          "untergangsstelle"
+        ]
+      },
+      {
+        "label": "Weiterfahrt erst nach Genehmigung des WSA",
+        "verneinend": true,
+        "treffer": [
+          "genehmig",
+          "erlaubnis",
+          "freigabe",
+          "zustimmung",
+          "erst weiter",
+          "nicht weiter",
+          "weiterfahr"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b07",
+    "bereich": "bsu",
+    "nummer": 7,
+    "gruppe": "bsu-stelle",
+    "frage": "Welche Stelle führt in Deutschland die Seeunfalluntersuchung durch? Nennen Sie deren Ziele und Veröffentlichungspflichten. Gibt es ein Widerspruchsrecht?",
+    "loesung": [
+      {
+        "h": "Stelle:"
+      },
+      {
+        "ul": [
+          "Bundesstelle für Seeunfalluntersuchung (BSU)"
+        ]
+      },
+      {
+        "h": "Ziele:"
+      },
+      {
+        "ul": [
+          "Untersuchung von Seeunfällen und Vorkommnissen",
+          "Verbesserung der Sicherheit in der Seeschifffahrt",
+          "Verhinderung zukünftiger Unfälle",
+          "Keine Untersuchung von Schuld- oder Haftungsfragen"
+        ]
+      },
+      {
+        "h": "Veröffentlichungspflicht:"
+      },
+      {
+        "ul": [
+          "Untersuchungsberichte und Ergebnisse werden veröffentlicht",
+          "Berichte dienen der Unfallprävention und Sicherheitsverbesserung"
+        ]
+      },
+      {
+        "h": "Widerspruchsrecht:"
+      },
+      {
+        "ul": [
+          "Nein",
+          "BSU-Berichte sind keine Verwaltungsakte und daher nicht anfechtbar."
+        ]
+      }
+    ],
+    "hinweis": "Eine Bundesstelle mit Sitz in Hamburg. Und: Ist ihr Bericht ein Verwaltungsakt?",
+    "mindestanzahl": 4,
+    "elemente": [
+      {
+        "label": "Bundesstelle für Seeunfalluntersuchung (BSU)",
+        "pflicht": true,
+        "treffer": [
+          "=bsu",
+          "bundesstelle"
+        ]
+      },
+      {
+        "label": "Sicherheit der Seeschifffahrt verbessern",
+        "treffer": [
+          "sicherheit",
+          "sicherer",
+          "verbesser"
+        ]
+      },
+      {
+        "label": "Zukünftige Unfälle verhindern",
+        "treffer": [
+          "verhinder",
+          "verhuet",
+          "vermeid",
+          "vorbeug",
+          "praevent",
+          "zukünftig",
+          "künftig"
+        ]
+      },
+      {
+        "label": "Keine Schuld- oder Haftungsfragen",
+        "verneinend": true,
+        "treffer": [
+          "schuld",
+          "haftung"
+        ]
+      },
+      {
+        "label": "Berichte werden veröffentlicht",
+        "pflicht": true,
+        "treffer": [
+          "veroeffentlich",
+          "publizier",
+          "oeffentlich",
+          "publik"
+        ]
+      },
+      {
+        "label": "Kein Widerspruchsrecht",
+        "pflicht": true,
+        "verneinend": true,
+        "treffer": [
+          "=nein",
+          "kein widerspruch",
+          "keine widerspruch",
+          "nicht anfechtbar",
+          "unanfechtbar",
+          "nicht anfechten",
+          "kein verwaltungsakt",
+          "keine verwaltungsakte",
+          "gibt es nicht",
+          "nicht möglich",
+          "ausgeschlossen"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b08",
+    "bereich": "bsu",
+    "nummer": 8,
+    "gruppe": "flagge",
+    "frage": "Nennen Sie das Schiffsdokument, das in der Regel dem deutschen Eigentümer eines Wassersportbootes als Nachweis des Eigentums und der Nationalität dient …\n• wenn die Rumpflänge 15 m nicht übersteigt,\n• wenn die Rumpflänge 15 m übersteigt.",
+    "loesung": [
+      {
+        "h": "Rumpflänge bis 15 m:"
+      },
+      {
+        "p": "Internationaler Bootsschein (IBS), ausgestellt vom Deutschen Segler-Verband (DSV), Deutschen Motoryachtverband (DMYV) oder ADAC."
+      },
+      {
+        "p": "Für Frankreich wird stattdessen häufig ein Flaggenzertifikat des Bundesamtes für Seeschifffahrt und Hydrographie (BSH) benötigt."
+      },
+      {
+        "h": "Rumpflänge über 15 m:"
+      },
+      {
+        "p": "Schiffszertifikat, ausgestellt vom Registergericht (Amtsgericht) nach Eintragung ins Seeschiffsregister. An Bord wird ein Auszug des Schiffszertifikats mitgeführt; es dient als uneingeschränkter Eigentums- und Nationalitätsnachweis."
+      },
+      {
+        "h": "Merksatz:"
+      },
+      {
+        "ul": [
+          "≤ 15 m: IBS (DSV/DMYV/ADAC), für Frankreich Flaggenzertifikat (BSH)",
+          "> 15 m: Schiffszertifikat (Registergericht)"
+        ]
+      }
+    ],
+    "hinweis": "Bis 15 m ein Dokument der Verbände, darüber der Nachweis aus dem Register.",
+    "mindestanzahl": 3,
+    "elemente": [
+      {
+        "label": "Bis 15 m: Internationaler Bootsschein (IBS)",
+        "pflicht": true,
+        "treffer": [
+          "=ibs",
+          "bootsschein"
+        ]
+      },
+      {
+        "label": "Ausgestellt von DSV, DMYV oder ADAC",
+        "treffer": [
+          "=dsv",
+          "=dmyv",
+          "=adac",
+          "seglerverband",
+          "segler verband",
+          "motoryachtverband",
+          "motoryacht",
+          "verband"
+        ]
+      },
+      {
+        "label": "Über 15 m: Schiffszertifikat",
+        "pflicht": true,
+        "treffer": [
+          "schiffszertifikat"
+        ]
+      },
+      {
+        "label": "Ausgestellt vom Registergericht (Amtsgericht)",
+        "treffer": [
+          "registergericht",
+          "amtsgericht",
+          "gericht",
+          "schiffsregister",
+          "register"
+        ]
+      },
+      {
+        "label": "Frankreich: Flaggenzertifikat (BSH)",
+        "treffer": [
+          "flaggenzertifikat"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b09",
+    "bereich": "bsu",
+    "nummer": 9,
+    "gruppe": "flagge",
+    "frage": "Welches Schiffsdokument können Sie sich für nicht registrierpflichtige Schiffe ausstellen lassen, wenn Sie z.B. in französischen Gewässern segeln wollen? Welche Behörde stellt dieses Dokument aus?",
+    "loesung": [
+      {
+        "p": "Flaggenzertifikat, ausgestellt vom BSH."
+      },
+      {
+        "ul": [
+          "Dokument für nicht registrierpflichtige Schiffe (z. B. für Frankreich): Flaggenzertifikat",
+          "Ausstellende Behörde: Bundesamt für Seeschifffahrt und Hydrographie (BSH)"
+        ]
+      }
+    ],
+    "hinweis": "Das Dokument ist nach dem benannt, was es erlaubt: die Bundesflagge zu führen.",
+    "mindestanzahl": 2,
+    "elemente": [
+      {
+        "label": "Flaggenzertifikat",
+        "pflicht": true,
+        "treffer": [
+          "flaggenzertifikat",
+          "flaggenschein"
+        ]
+      },
+      {
+        "label": "Bundesamt für Seeschifffahrt und Hydrographie (BSH)",
+        "pflicht": true,
+        "treffer": [
+          "=bsh",
+          "bundesamt",
+          "hydrographie",
+          "hydrografie"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b10",
+    "bereich": "bsu",
+    "nummer": 10,
+    "frage": "Nennen Sie das Schiffsdokument, das die Vermessung einer Yacht amtlich verbrieft; nennen Sie die hierfür verantwortliche Behörde.",
+    "loesung": [
+      {
+        "p": "Die Vermessung eines Seeschiffes erfolgt durch das Bundesamt für Seeschifffahrt und Hydrographie (BSH), das hierüber den Schiffsmessbrief ausstellt."
+      },
+      {
+        "ul": [
+          "Amtlicher Nachweis der Vermessung einer Yacht: Schiffsmessbrief",
+          "Ausstellende Behörde: Bundesamt für Seeschifffahrt und Hydrographie (BSH)"
+        ]
+      }
+    ],
+    "hinweis": "Ein „Brief“ über das Messen. Der Aussteller ist auch für die amtlichen Seekarten zuständig.",
+    "mindestanzahl": 2,
+    "elemente": [
+      {
+        "label": "Schiffsmessbrief",
+        "pflicht": true,
+        "treffer": [
+          "messbrief",
+          "vermessungsbrief"
+        ]
+      },
+      {
+        "label": "Bundesamt für Seeschifffahrt und Hydrographie (BSH)",
+        "pflicht": true,
+        "treffer": [
+          "=bsh",
+          "bundesamt",
+          "hydrographie",
+          "hydrografie"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b11",
+    "bereich": "bsu",
+    "nummer": 11,
+    "gruppe": "bsu-stelle",
+    "frage": "Welche Stelle führt in Deutschland die Seeunfalluntersuchung durch? Wie ist das Widerspruchs- und Berufungsverfahren geregelt?",
+    "loesung": [
+      {
+        "ul": [
+          "Zuständig ist die Bundesstelle für Seeunfalluntersuchung (BSU).",
+          "Ziel ist die Verbesserung der Sicherheit in der Seeschifffahrt und die Verhinderung zukünftiger Unfälle.",
+          "Die BSU untersucht keine Schuld- oder Haftungsfragen.",
+          "Untersuchungsergebnisse und Berichte werden veröffentlicht.",
+          "Gegen BSU-Berichte gibt es kein Widerspruchs- oder Berufungsverfahren, da sie keine Verwaltungsakte sind."
+        ]
+      }
+    ],
+    "hinweis": "Eine Bundesstelle mit Sitz in Hamburg. Kann man gegen einen Bericht vorgehen, der nichts anordnet?",
+    "mindestanzahl": 3,
+    "elemente": [
+      {
+        "label": "Bundesstelle für Seeunfalluntersuchung (BSU)",
+        "pflicht": true,
+        "treffer": [
+          "=bsu",
+          "bundesstelle"
+        ]
+      },
+      {
+        "label": "Sicherheit verbessern, Unfälle verhindern",
+        "treffer": [
+          "sicherheit",
+          "sicherer",
+          "verhinder",
+          "verhuet",
+          "vermeid",
+          "vorbeug",
+          "praevent"
+        ]
+      },
+      {
+        "label": "Keine Schuld- oder Haftungsfragen",
+        "verneinend": true,
+        "treffer": [
+          "schuld",
+          "haftung"
+        ]
+      },
+      {
+        "label": "Berichte werden veröffentlicht",
+        "treffer": [
+          "veroeffentlich",
+          "publizier",
+          "oeffentlich",
+          "publik"
+        ]
+      },
+      {
+        "label": "Kein Widerspruchs- oder Berufungsverfahren",
+        "pflicht": true,
+        "verneinend": true,
+        "treffer": [
+          "=nein",
+          "kein widerspruch",
+          "keine widerspruch",
+          "kein berufung",
+          "keine berufung",
+          "nicht anfechtbar",
+          "unanfechtbar",
+          "nicht anfechten",
+          "gibt es nicht",
+          "nicht möglich",
+          "ausgeschlossen"
+        ]
+      },
+      {
+        "label": "Berichte sind keine Verwaltungsakte",
+        "verneinend": true,
+        "treffer": [
+          "verwaltungsakt",
+          "rechtswirkung",
+          "unverbindlich",
+          "nicht bindend"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b12",
+    "bereich": "bsu",
+    "nummer": 12,
+    "gruppe": "bsu-stelle",
+    "frage": "Welches ist der wesentliche Zweck der Seeunfalluntersuchung?",
+    "loesung": [
+      {
+        "ul": [
+          "Ursachen und Umstände von Seeunfällen ermitteln (Mängel / Fehler bei Navigation, Schiffsführung oder Einhaltung von Vorschriften)",
+          "Die Sicherheit der Seeschifffahrt verbessern",
+          "Zukünftige Unfälle verhindern",
+          "Erkenntnisse zur Verbesserung von Vorschriften und Sicherheitsmaßnahmen gewinnen",
+          "Arbeitsschutz und Umweltschutz fördern",
+          "Keine Feststellung von Schuld oder Haftung, sondern Unfallprävention und Sicherheit im Seeverkehr (SUG § 1)"
+        ]
+      }
+    ],
+    "hinweis": "Nach vorn schauen statt zurück: Was soll aus einem Unfall gelernt werden?",
+    "mindestanzahl": 3,
+    "elemente": [
+      {
+        "label": "Ursachen und Umstände ermitteln",
+        "treffer": [
+          "ursache",
+          "umstaende",
+          "ermitteln",
+          "aufklaer",
+          "hergang",
+          "analys",
+          "^fehler",
+          "maengel"
+        ]
+      },
+      {
+        "label": "Sicherheit der Seeschifffahrt verbessern",
+        "pflicht": true,
+        "treffer": [
+          "sicherheit",
+          "sicherer",
+          "verbesser"
+        ]
+      },
+      {
+        "label": "Zukünftige Unfälle verhindern",
+        "pflicht": true,
+        "treffer": [
+          "verhinder",
+          "verhuet",
+          "vermeid",
+          "vorbeug",
+          "praevent",
+          "zukünftig",
+          "künftig",
+          "wiederholung"
+        ]
+      },
+      {
+        "label": "Erkenntnisse für Vorschriften und Massnahmen",
+        "treffer": [
+          "vorschrift",
+          "^regeln",
+          "massnahme",
+          "erkenntnis",
+          "lernen",
+          "empfehlung"
+        ]
+      },
+      {
+        "label": "Arbeits- und Umweltschutz fördern",
+        "treffer": [
+          "arbeitsschutz",
+          "umweltschutz",
+          "umwelt",
+          "arbeitssicherheit"
+        ]
+      },
+      {
+        "label": "Keine Feststellung von Schuld oder Haftung",
+        "verneinend": true,
+        "treffer": [
+          "schuld",
+          "haftung"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b13",
+    "bereich": "bsu",
+    "nummer": 13,
+    "gruppe": "bsu-stelle",
+    "frage": "Welche Stelle führt in Deutschland die Seeunfalluntersuchung durch?\nNennen Sie deren Ziele und Veröffentlichungspflichten.",
+    "loesung": [
+      {
+        "p": "Die BSU untersucht Seeunfälle und Vorkommnisse unabhängig und objektiv mit dem Ziel, die Sicherheit der Seeschifffahrt zu verbessern und zukünftige Unfälle zu verhindern. Sie untersucht keine individuellen Schuldfragen oder Konsequenzen für die Beteiligten. Das ist ausdrücklich im Seesicherheits-Untersuchungs-Gesetz (SUG) geregelt."
+      },
+      {
+        "p": "Die BSU ist verpflichtet, ihre Untersuchungsergebnisse und Berichte zu veröffentlichen, insbesondere wenn sie sicherheitsrelevante Erkenntnisse enthalten. Die Berichte dienen der Prävention und werden unabhängig erstellt."
+      },
+      {
+        "h": "Kurzfassung für die Prüfung:"
+      },
+      {
+        "ul": [
+          "Zuständige Stelle: Bundesstelle für Seeunfalluntersuchung (BSU)",
+          "Ziele: Verbesserung der Sicherheit der Seeschifffahrt, Verhütung künftiger Unfälle, keine Klärung von Schuld- oder Haftungsfragen",
+          "Veröffentlichungspflicht: Untersuchungsergebnisse und Berichte werden veröffentlicht, insbesondere bei sicherheitsrelevanten Erkenntnissen."
+        ]
+      }
+    ],
+    "hinweis": "Eine Bundesstelle mit Sitz in Hamburg. Und was geschieht mit ihren Ergebnissen?",
+    "mindestanzahl": 3,
+    "elemente": [
+      {
+        "label": "Bundesstelle für Seeunfalluntersuchung (BSU)",
+        "pflicht": true,
+        "treffer": [
+          "=bsu",
+          "bundesstelle"
+        ]
+      },
+      {
+        "label": "Sicherheit der Seeschifffahrt verbessern",
+        "treffer": [
+          "sicherheit",
+          "sicherer",
+          "verbesser"
+        ]
+      },
+      {
+        "label": "Künftige Unfälle verhüten",
+        "treffer": [
+          "verhinder",
+          "verhuet",
+          "vermeid",
+          "vorbeug",
+          "praevent",
+          "zukünftig",
+          "künftig"
+        ]
+      },
+      {
+        "label": "Keine Schuld- oder Haftungsfragen",
+        "verneinend": true,
+        "treffer": [
+          "schuld",
+          "haftung"
+        ]
+      },
+      {
+        "label": "Ergebnisse und Berichte werden veröffentlicht",
+        "pflicht": true,
+        "treffer": [
+          "veroeffentlich",
+          "publizier",
+          "oeffentlich",
+          "publik"
+        ]
+      },
+      {
+        "label": "Unabhängig und objektiv",
+        "treffer": [
+          "unabhaengig",
+          "objektiv",
+          "neutral",
+          "weisungsfrei"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "b14",
+    "bereich": "bsu",
+    "nummer": 14,
+    "frage": "Ab wann müssen Sportfahrzeuge in das Seeschiffsregister eingetragen werden?",
+    "loesung": [
+      {
+        "p": "Die Eintragung in das deutsche Seeschiffsregister ist für deutsche Eigentümer von Seeschiffen mit einer Rumpflänge von mehr als 15 Metern verpflichtend."
+      },
+      {
+        "p": "Sportfahrzeuge müssen in das Seeschiffsregister eingetragen werden, wenn ihre Rumpflänge 15 m übersteigt. Für Sportfahrzeuge bis 15 m ist die Eintragung freiwillig."
+      },
+      {
+        "h": "Merkhilfe:"
+      },
+      {
+        "ul": [
+          "≤ 15 m: keine Eintragungspflicht (freiwillige Registereintragung möglich); Nachweis z. B. durch IBS oder Flaggenzertifikat",
+          "> 15 m: Eintragung ins Seeschiffsregister vorgeschrieben (§ 10 SchRegO)"
+        ]
+      }
+    ],
+    "hinweis": "Eine Längengrenze entscheidet, dieselbe wie beim Internationalen Bootsschein.",
+    "mindestanzahl": 2,
+    "elemente": [
+      {
+        "label": "Rumpflänge 15 m",
+        "pflicht": true,
+        "treffer": [
+          "#15-15",
+          "=fuenfzehn",
+          "^15m"
+        ]
+      },
+      {
+        "label": "Mehr als 15 m (übersteigt)",
+        "treffer": [
+          "ueber",
+          "mehr als",
+          "uebersteig",
+          "laenger als",
+          "groesser als"
+        ]
+      },
+      {
+        "label": "Bis 15 m freiwillig",
+        "verneinend": true,
+        "treffer": [
+          "freiwillig",
+          "optional",
+          "keine pflicht",
+          "nicht pflicht",
+          "nicht verpflichtend",
+          "nicht vorgeschrieben",
+          "kann",
+          "möglich"
+        ]
+      }
+    ]
+  }
+]
+</script>
+<script>
+/* ==========================================================================
+   MARPOL-BSU&BSH
+   Teil 1: Bewertung freier Antworten (ohne DOM-Zugriff)
+   Teil 2: Ablauf der Runde und Oberfläche
+   ========================================================================== */
+"use strict";
+
+/* ---------------------------------------------------------------------------
+   Teil 1: Bewertung
+   --------------------------------------------------------------------------- */
+const Bewertung = (() => {
+  const VERNEINUNG = new Set(["nicht", "kein", "keine", "keinen", "keiner", "keinem", "keines", "nie", "niemals"]);
+
+  // Kleinschreibung, Umlaute falten, ß -> ss, übrige Akzente entfernen.
+  function falten(s) {
+    return String(s).toLowerCase()
+      .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+      .normalize("NFD").replace(/[̀-ͯ]/g, "");
+  }
+
+  // Text -> Abschnitte (getrennt an Satz- und Aufzählungsgrenzen) -> Wörter
+  function zerlegen(text) {
+    return falten(text)
+      .split(/[.!?;,\n\r•]+/)
+      .map((teil) => teil.replace(/[^a-z0-9]+/g, " ").trim())
+      .filter(Boolean)
+      .map((teil) => teil.split(" "));
+  }
+
+  // Erlaubte Tippfehler je Begriffslänge
+  function toleranz(n) {
+    if (n < 7) return 0;
+    if (n <= 9) return 1;
+    return 2;
+  }
+
+  function levenshtein(a, b) {
+    if (a === b) return 0;
+    const m = a.length, n = b.length;
+    if (!m) return n;
+    if (!n) return m;
+    let vor = new Array(n + 1);
+    for (let j = 0; j <= n; j++) vor[j] = j;
+    for (let i = 1; i <= m; i++) {
+      const akt = [i];
+      for (let j = 1; j <= n; j++) {
+        akt[j] = Math.min(vor[j] + 1, akt[j - 1] + 1, vor[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      vor = akt;
+    }
+    return vor[n];
+  }
+
+  // Kleinster Abstand zwischen Begriff p und einem Teilstück von w, das mit
+  // demselben Buchstaben beginnt wie p. Damit greifen Tippfehler im Wortinneren
+  // und am Ende.
+  function teilAbstand(p, w, tol) {
+    if (w.includes(p)) return 0;
+    let best = Infinity;
+    for (let start = 0; start < w.length; start++) {
+      if (w[start] !== p[0]) continue;
+      const rest = w.slice(start);
+      let vor = new Array(rest.length + 1);
+      for (let j = 0; j <= rest.length; j++) vor[j] = j;
+      for (let i = 1; i <= p.length; i++) {
+        const akt = [i];
+        for (let j = 1; j <= rest.length; j++) {
+          akt[j] = Math.min(vor[j] + 1, akt[j - 1] + 1, vor[j - 1] + (p[i - 1] === rest[j - 1] ? 0 : 1));
+        }
+        vor = akt;
+      }
+      for (let j = Math.max(1, p.length - tol); j <= rest.length; j++) best = Math.min(best, vor[j]);
+      if (best === 0) break;
+    }
+    return best;
+  }
+
+  // Ein Suchwort mit optionalem Steuerzeichen:
+  //   =wort  ganzes Wort exakt
+  //   ^wort  Wortanfang exakt
+  //   ~wort  ganzes Wort mit Tippfehler-Toleranz
+  //   #a-b   Zahl im Bereich a bis b
+  //   wort   Standard: unter 4 Zeichen exakt, 4 Zeichen Wortanfang,
+  //          5–6 Zeichen als Wortteil, ab 7 Zeichen Wortteil mit Toleranz
+  function wortSpec(roh) {
+    const z = roh[0];
+    if (z === "#") {
+      const [a, b] = roh.slice(1).split("-").map(Number);
+      return { art: "#", a, b };
+    }
+    if (z === "=" || z === "^" || z === "~") {
+      return { art: z, s: falten(roh.slice(1)).replace(/[^a-z0-9]/g, "") };
+    }
+    return { art: "", s: falten(roh).replace(/[^a-z0-9]/g, "") };
+  }
+
+  function wortTrifft(spec, w) {
+    const s = spec.s;
+    switch (spec.art) {
+      case "#": return /^\d+$/.test(w) && +w >= spec.a && +w <= spec.b;
+      case "=": return w === s;
+      case "^": return w.startsWith(s);
+      case "~": return levenshtein(w, s) <= Math.max(toleranz(s.length), s.length >= 5 ? 1 : 0);
+      default:
+        if (s.length < 4) return w === s;
+        if (s.length === 4) return w.startsWith(s);
+        if (s.length <= 6) return w.includes(s);
+        return teilAbstand(s, w, toleranz(s.length)) <= toleranz(s.length);
+    }
+  }
+
+  // Treffer vorbereiten: "schutz der meere" -> [{...},{...},{...}]
+  function trefferSpec(roh) {
+    const marke = /^[=^~]/.test(roh) ? roh[0] : "";
+    if (roh[0] === "#") return [wortSpec(roh)];
+    const rest = marke ? roh.slice(1) : roh;
+    const woerter = falten(rest).replace(/[^a-z0-9 ]+/g, " ").trim().split(/\s+/);
+    // Steuerzeichen am Anfang gilt für alle Wörter des Treffers
+    return woerter.map((w) => wortSpec(marke + w));
+  }
+
+  // Sucht einen Treffer in einem Abschnitt. Liefert Startindex oder -1.
+  function sucheInAbschnitt(specs, toks, verneinend) {
+    for (let i = 0; i < toks.length; i++) {
+      let pos = -1;
+      if (specs.length === 1) {
+        if (wortTrifft(specs[0], toks[i])) pos = i;
+        // Getrennt geschriebenes Kompositum: „flaggen zertifikat“
+        else if (!specs[0].art && specs[0].s && specs[0].s.length >= 7 && i + 1 < toks.length &&
+                 wortTrifft(specs[0], toks[i] + toks[i + 1])) pos = i;
+      } else if (wortTrifft(specs[0], toks[i])) {
+        // Wortfolge: Wörter in dieser Reihenfolge, bis zu zwei Wörter dazwischen
+        let k = i, ok = true;
+        for (let t = 1; t < specs.length; t++) {
+          let gefunden = -1;
+          for (let j = k + 1; j <= Math.min(toks.length - 1, k + 3); j++) {
+            if (wortTrifft(specs[t], toks[j])) { gefunden = j; break; }
+          }
+          if (gefunden < 0) { ok = false; break; }
+          k = gefunden;
+        }
+        if (ok) pos = i;
+      }
+      if (pos < 0) continue;
+      if (!verneinend && istVerneint(toks, pos)) continue;
+      return pos;
+    }
+    return -1;
+  }
+
+  function istVerneint(toks, pos) {
+    const v1 = toks[pos - 1], v2 = toks[pos - 2];
+    if (v1 && VERNEINUNG.has(v1)) return true;
+    if (v2 && VERNEINUNG.has(v2) && v1 !== "nur") return true;
+    return false;
+  }
+
+  function elementErkannt(el, abschnitte) {
+    for (const roh of el.treffer) {
+      const specs = trefferSpec(roh);
+      for (const toks of abschnitte) {
+        if (sucheInAbschnitt(specs, toks, !!el.verneinend) >= 0) return true;
+      }
+    }
+    return false;
+  }
+
+  // Ergebnis: { stufe: "richtig"|"teilweise"|"falsch", erkannt: [bool], anzahl, soll, gesamt, fehlendePflicht: [label] }
+  function bewerten(frage, antwort) {
+    const abschnitte = zerlegen(antwort);
+    const erkannt = frage.elemente.map((el) => elementErkannt(el, abschnitte));
+    const anzahl = erkannt.filter(Boolean).length;
+    const soll = frage.mindestanzahl;
+    const fehlendePflicht = frage.elemente.filter((el, i) => el.pflicht && !erkannt[i]).map((el) => el.label);
+    let stufe = "falsch";
+    if (anzahl >= soll && fehlendePflicht.length === 0) stufe = "richtig";
+    else if (anzahl > 0 && anzahl >= Math.ceil(soll / 2)) stufe = "teilweise";
+    return { stufe, erkannt, anzahl, soll, gesamt: frage.elemente.length, fehlendePflicht };
+  }
+
+  return { bewerten, falten, zerlegen, levenshtein };
+})();
+
+/* ---------------------------------------------------------------------------
+   Teil 2: Ablauf und Oberfläche
+   --------------------------------------------------------------------------- */
+const FRAGEN = JSON.parse(document.getElementById("fragen-daten").textContent);
+const NACH_ID = Object.fromEntries(FRAGEN.map((f) => [f.id, f]));
+const MARPOL = FRAGEN.filter((f) => f.bereich === "marpol").map((f) => f.id);
+const BSU = FRAGEN.filter((f) => f.bereich === "bsu").map((f) => f.id);
+const MAX_WDH = 2;      // höchstens zwei Wiederholungen je Frage
+const ABSTAND = 3;      // frühestens nach drei anderen Fragen
+const WIEDERHOLEN = new Set(["falsch", "geloest"]);   // nur diese Ausgänge kommen wieder
+
+const BEREICH_NAME = { marpol: "MARPOL", bsu: "BSU&BSH" };
+const BEREICH_KURZ = { marpol: "M", bsu: "B" };
+
+// Bereiche und Rundengrössen. "Alle" ergibt sich aus der Zahl der Fragen.
+// Gemischte Runden ziehen MARPOL und BSU&BSH im Verhältnis der Bestände.
+const BEREICHE = [
+  { id: "marpol", titel: "MARPOL", sub: "Umweltschutz auf See", ids: MARPOL, groessen: [] },
+  { id: "bsu", titel: "BSU & BSH", sub: "Seeunfall, Verantwortung, Schiffsdokumente", ids: BSU, groessen: [10] },
+  { id: "mix", titel: "Gemischt", sub: "Aus beiden Bereichen", ids: [...MARPOL, ...BSU], groessen: [10, 15] },
+];
+for (const b of BEREICHE) {
+  b.groessen = [...b.groessen.filter((g) => g < b.ids.length), b.ids.length];
+}
+const NACH_BEREICH = Object.fromEntries(BEREICHE.map((b) => [b.id, b]));
+
+function mixAnteil(n) {
+  const m = Math.round((n * MARPOL.length) / (MARPOL.length + BSU.length));
+  return { m, b: n - m };
+}
+
+const $ = (id) => document.getElementById(id);
+const IST_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+
+/* ---------- Speicher mit Ersatz, falls blockiert ---------- */
+const speicher = (() => {
+  const ersatz = {};
+  return {
+    lesen(k) { try { return localStorage.getItem(k); } catch { return ersatz[k] ?? null; } },
+    schreiben(k, v) { try { localStorage.setItem(k, v); } catch { ersatz[k] = v; } },
+    loeschen(k) { try { localStorage.removeItem(k); } catch { delete ersatz[k]; } },
+  };
+})();
+
+function jsonLesen(k, standard) {
+  try { const v = JSON.parse(speicher.lesen(k)); return v && typeof v === "object" ? v : standard; }
+  catch { return standard; }
+}
+
+/* ---------- Einstellung ---------- */
+const einstellung = (() => {
+  const e = jsonLesen("marpolbsu.einstellung", {});
+  const bereich = NACH_BEREICH[e.bereich] ? e.bereich : "mix";
+  const groessen = e.groessen && typeof e.groessen === "object" ? e.groessen : {};
+  return { bereich, groessen };
+})();
+function groesseVon(bereichId) {
+  const b = NACH_BEREICH[bereichId];
+  const g = einstellung.groessen[bereichId];
+  return b.groessen.includes(g) ? g : b.groessen[0];
+}
+function einstellungSpeichern() {
+  speicher.schreiben("marpolbsu.einstellung", JSON.stringify(einstellung));
+}
+
+/* ---------- Lernstand: letztes Ergebnis je Frage ---------- */
+const LERN_KEY = "marpolbsu.lernstand";
+let lernstand = jsonLesen(LERN_KEY, {});
+function lernstandSetzen(id, ausgang) {
+  lernstand[id] = ausgang;
+  speicher.schreiben(LERN_KEY, JSON.stringify(lernstand));
+}
+function bisherFalsche(bereichId) {
+  return NACH_BEREICH[bereichId].ids.filter((id) => lernstand[id] && lernstand[id] !== "richtig");
+}
+
+/* ---------- Zustand ---------- */
+let runde = null;     // aktuelle Runde
+let aktuell = null;   // { id, hinweis, ergebnis, ausgang, abgeschlossen }
+let vorListe = "start";
+let listenFilter = "alle";
+
+function mischen(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Zwei Fragen derselben Themengruppe?
+function gleicheGruppe(a, b) {
+  if (!a || !b) return false;
+  const ga = NACH_ID[a].gruppe;
+  return !!ga && ga === NACH_ID[b].gruppe;
+}
+
+// Zufällige Reihenfolge, in der Fragen derselben Gruppe nicht direkt aufeinander folgen.
+function ordnen(ids) {
+  let beste = null, besteFehler = Infinity;
+  for (let versuch = 0; versuch < 80 && besteFehler > 0; versuch++) {
+    const rest = mischen(ids);
+    const folge = [];
+    while (rest.length) {
+      const letzte = folge[folge.length - 1];
+      let i = rest.findIndex((id) => !gleicheGruppe(id, letzte));
+      if (i < 0) i = 0;
+      folge.push(rest.splice(i, 1)[0]);
+    }
+    let fehler = 0;
+    for (let i = 1; i < folge.length; i++) if (gleicheGruppe(folge[i], folge[i - 1])) fehler++;
+    if (fehler < besteFehler) { beste = folge; besteFehler = fehler; }
+  }
+  return beste || [];
+}
+
+// Fragen für eine Runde ziehen
+function ziehen(bereichId, n) {
+  if (bereichId === "mix") {
+    const { m, b } = mixAnteil(n);
+    return [...mischen(MARPOL).slice(0, m), ...mischen(BSU).slice(0, b)];
+  }
+  return mischen(NACH_BEREICH[bereichId].ids).slice(0, n);
+}
+
+function rundeStarten(ids) {
+  const auswahl = ordnen(ids);
+  runde = {
+    ids: auswahl,
+    queue: auswahl.slice(),
+    gezeigt: 0,          // Zahl erstmals gestellter Fragen
+    vorzeitig: false,
+    st: Object.fromEntries(auswahl.map((id) => [id, {
+      wdh: 0, erst: null, erstHinweis: false, final: null, letzteAntwort: "", versuche: 0,
+    }])),
+  };
+  zeige("frage");
+  naechsteFrage();
+}
+
+function neueRunde() {
+  const b = einstellung.bereich;
+  rundeStarten(ziehen(b, groesseVon(b)));
+}
+
+function naechsteFrage() {
+  if (!runde.queue.length) return ergebnisZeigen();
+  const id = runde.queue.shift();
+  const s = runde.st[id];
+  if (s.versuche === 0) runde.gezeigt++;
+  aktuell = { id, hinweis: false, ergebnis: null, ausgang: null, abgeschlossen: false };
+  frageRendern();
+}
+
+function erledigt() {
+  return runde.ids.filter((id) => runde.st[id].final !== null).length;
+}
+
+function wirdWiederholt(ausgang) {
+  return WIEDERHOLEN.has(ausgang) && runde.st[aktuell.id].wdh < MAX_WDH;
+}
+
+// Wiederholung einreihen: frühestens nach ABSTAND anderen Fragen, möglichst
+// nicht direkt neben einer Frage derselben Gruppe.
+function wiederEinreihen(id) {
+  const q = runde.queue;
+  const ab = Math.min(ABSTAND, q.length);
+  let pos = ab;
+  for (let p = ab; p <= q.length; p++) {
+    const vor = p === 0 ? null : q[p - 1];
+    const nach = q[p];
+    if (!gleicheGruppe(id, vor) && !gleicheGruppe(id, nach)) { pos = p; break; }
+  }
+  q.splice(pos, 0, id);
+}
+
+// Ausgang einer Frage verbuchen: richtig | teilweise | falsch | geloest | uebersprungen
+function verbuchen(ausgang) {
+  const s = runde.st[aktuell.id];
+  s.versuche++;
+  if (s.erst === null) { s.erst = ausgang; s.erstHinweis = aktuell.hinweis; }
+  lernstandSetzen(aktuell.id, ausgang);
+  if (ausgang === "richtig") { s.final = "richtig"; return "fertig"; }
+  if (WIEDERHOLEN.has(ausgang)) {
+    if (s.wdh < MAX_WDH) {
+      s.wdh++;
+      wiederEinreihen(aktuell.id);
+      return "wieder";
+    }
+    s.final = "offen";
+    return "offen";
+  }
+  // teilweise oder übersprungen: keine Wiederholung, erscheint im Ergebnis
+  s.final = ausgang;
+  return "notiert";
+}
+
+/* ---------- Ansichten ---------- */
+const SCREENS = ["start", "frage", "ergebnis", "liste"];
+let screenJetzt = "start";
+
+function zeige(name) {
+  screenJetzt = name;
+  for (const s of SCREENS) $("screen-" + s).hidden = s !== name;
+  $("btn-zurueck").hidden = name === "start";
+  $("btn-liste").hidden = name === "liste" || name === "frage";
+  if (name === "start") $("crumb").textContent = `${FRAGEN.length} Prüfungsfragen`;
+  if (name === "liste") $("crumb").textContent = "Alle Fragen";
+  if (name === "ergebnis") $("crumb").textContent = "Ergebnis";
+  window.scrollTo(0, 0);
+}
+
+function kurz(f) { return BEREICH_KURZ[f.bereich] + f.nummer; }
+function nrText(f) { return `${BEREICH_NAME[f.bereich]} · Nr. ${f.nummer}`; }
+
+/* ---------- Start ---------- */
+function radioGruppe(box, eintraege, gewaehlt, waehlen) {
+  box.innerHTML = "";
+  for (const e of eintraege) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "choice" + (e.klasse ? " " + e.klasse : "");
+    b.setAttribute("role", "radio");
+    b.setAttribute("aria-checked", String(e.wert === gewaehlt));
+    b.setAttribute("aria-label", e.aria);
+    b.tabIndex = e.wert === gewaehlt ? 0 : -1;
+    b.innerHTML = e.html;
+    b.addEventListener("click", () => { waehlen(e.wert); box.querySelector('[aria-checked="true"]').focus(); });
+    box.appendChild(b);
+  }
+  box.onkeydown = (ev) => {
+    const werte = eintraege.map((e) => e.wert);
+    const i = werte.indexOf(gewaehlt);
+    let n = null;
+    if (ev.key === "ArrowRight" || ev.key === "ArrowDown") n = (i + 1) % werte.length;
+    if (ev.key === "ArrowLeft" || ev.key === "ArrowUp") n = (i - 1 + werte.length) % werte.length;
+    if (n === null) return;
+    ev.preventDefault();
+    waehlen(werte[n]);
+    box.querySelector('[aria-checked="true"]').focus();
+  };
+}
+
+function startRendern() {
+  $("start-titel").textContent = `${FRAGEN.length} Fragen üben`;
+
+  radioGruppe($("bereich-choices"), BEREICHE.map((b) => ({
+    wert: b.id,
+    klasse: "bereich",
+    aria: `${b.titel}, ${b.ids.length} Fragen`,
+    html: `<span class="choice-text"><span class="choice-title">${b.titel}</span><span class="choice-sub">${b.sub}</span></span><span class="choice-count">${b.ids.length}</span>`,
+  })), einstellung.bereich, (wert) => { einstellung.bereich = wert; einstellungSpeichern(); startRendern(); });
+
+  const b = NACH_BEREICH[einstellung.bereich];
+  const g = groesseVon(b.id);
+  const box = $("groesse-choices");
+  box.style.setProperty("--n", String(Math.max(b.groessen.length, 2)));
+  radioGruppe(box, b.groessen.map((n) => {
+    const alle = n === b.ids.length;
+    let sub = alle ? `${n} Fragen` : "Fragen";
+    if (b.id === "mix" && !alle) { const a = mixAnteil(n); sub = `${a.m} + ${a.b}`; }
+    return {
+      wert: n,
+      aria: alle ? `Alle ${n} Fragen` : `${n} Fragen` + (b.id === "mix" ? `, ${mixAnteil(n).m} MARPOL und ${mixAnteil(n).b} BSU und BSH` : ""),
+      html: `<span class="choice-title">${alle ? "Alle" : n}</span><span class="choice-sub">${sub}</span>`,
+    };
+  }), g, (wert) => { einstellung.groessen[b.id] = wert; einstellungSpeichern(); startRendern(); });
+
+  const falsche = bisherFalsche(b.id);
+  const bf = $("btn-falsche");
+  bf.disabled = !falsche.length;
+  bf.textContent = falsche.length
+    ? `Nur bisher Falsche üben (${falsche.length})`
+    : "Nur bisher Falsche üben – keine offen";
+}
+
+/* ---------- Frage ---------- */
+function frageRendern() {
+  const f = NACH_ID[aktuell.id];
+  const s = runde.st[aktuell.id];
+  const n = runde.ids.length;
+  $("frage-label").innerHTML = s.versuche === 0
+    ? `${BEREICH_NAME[f.bereich]} · Frage ${runde.gezeigt} von ${n} · Nr. ${f.nummer}`
+    : `<span class="wdh">Wiederholung ${s.wdh} von ${MAX_WDH}</span> · ${BEREICH_NAME[f.bereich]} · Nr. ${f.nummer}`;
+  $("frage-text").textContent = f.frage;
+  const anteil = Math.round((erledigt() / n) * 100);
+  $("meter-fill").style.width = anteil + "%";
+  $("meter").setAttribute("aria-valuenow", String(anteil));
+  $("crumb").textContent = `${erledigt()} von ${n} erledigt`;
+
+  const ta = $("antwort");
+  ta.value = "";
+  ta.readOnly = false;
+  ta.rows = 6;
+  ta.style.height = "";
+  ta.placeholder = "Antwort frei formulieren. Stichworte genügen, Fachbegriffe zählen.";
+  $("kbd-hint").hidden = !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  $("kbd-hint").textContent = (IST_MAC ? "Cmd" : "Strg") + " + Enter prüft";
+  $("hinweis-note").hidden = true;
+  $("btn-hinweis").disabled = false;
+  $("btn-pruefen").disabled = true;
+  $("frage-aktionen").hidden = false;
+  $("auswertung").hidden = true;
+
+  // Fokus: auf Geräten mit Tastatur direkt ins Antwortfeld
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) ta.focus({ preventScroll: true });
+  else $("frage-text").focus({ preventScroll: true });
+  window.scrollTo(0, 0);
+}
+
+function hinweisZeigen() {
+  const f = NACH_ID[aktuell.id];
+  aktuell.hinweis = true;
+  $("hinweis-text").textContent = f.hinweis;
+  $("hinweis-note").hidden = false;
+  $("btn-hinweis").disabled = true;
+  $("antwort").focus({ preventScroll: true });
+}
+
+function pruefen() {
+  const text = $("antwort").value.trim();
+  if (!text || aktuell.abgeschlossen || aktuell.ausgang) return;
+  const f = NACH_ID[aktuell.id];
+  aktuell.ergebnis = Bewertung.bewerten(f, text);
+  aktuell.ausgang = aktuell.ergebnis.stufe;
+  runde.st[aktuell.id].letzteAntwort = text;
+  auswertungZeigen();
+}
+
+function loesen() {
+  if (aktuell.abgeschlossen || aktuell.ausgang) return;
+  aktuell.ergebnis = null;
+  aktuell.ausgang = "geloest";
+  const text = $("antwort").value.trim();
+  if (text) runde.st[aktuell.id].letzteAntwort = text;
+  auswertungZeigen();
+}
+
+function ueberspringen() {
+  if (aktuell.abgeschlossen) return;
+  aktuell.abgeschlossen = true;
+  verbuchen("uebersprungen");
+  toast("Übersprungen – steht im Ergebnis");
+  naechsteFrage();
+}
+
+const KOPF = {
+  richtig: "Richtig",
+  teilweise: "Teilweise richtig",
+  falsch: "Falsch",
+  geloest: "Lösung angezeigt",
+};
+const KLASSE = { richtig: "ok", teilweise: "skip", falsch: "no", geloest: "skip" };
+
+function auswertungZeigen() {
+  const f = NACH_ID[aktuell.id];
+  const e = aktuell.ergebnis;
+  const ausgang = aktuell.ausgang;
+
+  const ta = $("antwort");
+  ta.readOnly = true;
+  if (!ta.value.trim()) ta.placeholder = "Keine Antwort eingegeben";
+  $("kbd-hint").hidden = true;
+  $("frage-aktionen").hidden = true;
+  $("auswertung").hidden = false;
+  ta.rows = 1;
+  ta.style.height = "auto";
+  ta.style.height = (ta.scrollHeight + 2) + "px";
+
+  verdictSetzen(ausgang);
+
+  // Chips
+  const chips = $("element-chips");
+  chips.innerHTML = "";
+  f.elemente.forEach((el, i) => {
+    const c = document.createElement("span");
+    const treffer = e && e.erkannt[i];
+    c.className = "chip" + (e ? (treffer ? " hit" : " fehlt") : "");
+    c.innerHTML = `<i aria-hidden="true">${e && treffer ? "✓" : "·"}</i>`;
+    c.appendChild(document.createTextNode(el.label));
+    if (el.pflicht) {
+      const p = document.createElement("span");
+      p.className = "pf";
+      p.textContent = "★";
+      p.title = "Pflichtpunkt";
+      c.appendChild(p);
+    }
+    c.setAttribute("aria-label", `${el.label}${el.pflicht ? ", Pflichtpunkt" : ""}${e ? (treffer ? ", erkannt" : ", fehlt") : ""}`);
+    chips.appendChild(c);
+  });
+
+  loesungRendern($("loesung-box"), f);
+  const anm = $("loesung-anmerkung");
+  anm.hidden = !f.anmerkung;
+  anm.innerHTML = f.anmerkung ? "<b>Anmerkung:</b> " : "";
+  if (f.anmerkung) anm.appendChild(document.createTextNode(f.anmerkung));
+
+  weiterBeschriften();
+  $("verdict-head").focus({ preventScroll: true });
+  $("verdict").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+}
+
+function weiterBeschriften() {
+  $("btn-weiter").textContent = runde.queue.length || wirdWiederholt(aktuell.ausgang) ? "Weiter" : "Zum Ergebnis";
+}
+
+function verdictSetzen(ausgang) {
+  const e = aktuell.ergebnis;
+  $("verdict").className = "verdict " + KLASSE[ausgang];
+  $("verdict-head").textContent = KOPF[ausgang] + (ausgang === "richtig" && aktuell.hinweis ? " (mit Hinweis)" : "");
+  const sub = $("verdict-sub");
+  sub.innerHTML = "";
+  const folge = WIEDERHOLEN.has(ausgang)
+    ? (wirdWiederholt(ausgang) ? "Kommt später nochmals." : "Bleibt offen.")
+    : "Steht im Ergebnis unter „Noch einmal ansehen“.";
+  if (aktuell.ueberstimmt) {
+    sub.textContent = "Von Ihnen als richtig gewertet.";
+  } else if (e) {
+    sub.innerHTML = `<b>${e.anzahl} von ${e.gesamt}</b> Schlüsselelementen erkannt` +
+      (e.anzahl < e.soll && e.soll < e.gesamt ? ` (nötig: ${e.soll})` : "") + ".";
+    if (e.fehlendePflicht.length && e.anzahl > 0) {
+      sub.appendChild(document.createTextNode(" Fehlt: " + e.fehlendePflicht.join(", ") + "."));
+    }
+    if (ausgang !== "richtig") sub.appendChild(document.createTextNode(" " + folge));
+  } else {
+    sub.textContent = wirdWiederholt(ausgang) ? "Die Frage kommt später nochmals." : "Die Frage bleibt offen.";
+  }
+  $("btn-doch").hidden = !(e && (ausgang === "teilweise" || ausgang === "falsch"));
+}
+
+function dochRichtig() {
+  aktuell.ausgang = "richtig";
+  aktuell.ueberstimmt = true;
+  verdictSetzen("richtig");
+  weiterBeschriften();
+  $("verdict-head").focus({ preventScroll: true });
+}
+
+function weiter() {
+  if (aktuell.abgeschlossen || !aktuell.ausgang) return;
+  aktuell.abgeschlossen = true;
+  verbuchen(aktuell.ausgang);
+  naechsteFrage();
+}
+
+// Musterlösung aus Blöcken: {h}, {h2}, {p}, {ul:[…]}, {ol:[…]}
+function loesungRendern(box, f) {
+  box.innerHTML = "";
+  for (const blk of f.loesung) {
+    let el;
+    if (blk.h !== undefined) { el = document.createElement("p"); el.className = "lz-h"; el.textContent = blk.h; }
+    else if (blk.h2 !== undefined) { el = document.createElement("p"); el.className = "lz-h2"; el.textContent = blk.h2; }
+    else if (blk.ul || blk.ol) {
+      el = document.createElement(blk.ul ? "ul" : "ol");
+      for (const z of blk.ul || blk.ol) {
+        const li = document.createElement("li");
+        li.textContent = z;
+        el.appendChild(li);
+      }
+    } else { el = document.createElement("p"); el.textContent = blk.p; }
+    box.appendChild(el);
+  }
+}
+function loesungText(f) {
+  return f.loesung.map((b) => b.h ?? b.h2 ?? b.p ?? (b.ul || b.ol || []).join(" ")).join(" ");
+}
+
+/* ---------- Ergebnis ---------- */
+const ERGEBNIS_TEXT = {
+  richtig: "richtig", teilweise: "teilweise", falsch: "falsch", geloest: "gelöst", uebersprungen: "übersprungen",
+};
+
+function ergebnisZeigen() {
+  zeige("ergebnis");
+  const gestellt = runde.ids.filter((id) => runde.st[id].erst !== null);
+  const n = gestellt.length;
+  const st = (id) => runde.st[id];
+  const erstRichtig = gestellt.filter((id) => st(id).erst === "richtig");
+  const mitHinweis = erstRichtig.filter((id) => st(id).erstHinweis).length;
+  const spaeter = gestellt.filter((id) => st(id).erst !== "richtig" && st(id).final === "richtig");
+
+  $("ergebnis-eyebrow").textContent = runde.vorzeitig
+    ? `Vorzeitig beendet · ${n} von ${runde.ids.length} Fragen gestellt`
+    : "Runde beendet";
+  $("ergebnis-score").textContent = n ? Math.round((erstRichtig.length / n) * 100) + " %" : "–";
+  $("ergebnis-zahl").textContent = `${erstRichtig.length}/${n}`;
+
+  const facts = $("ergebnis-facts");
+  facts.innerHTML = "";
+  const fakt = (zahl, text) => {
+    if (!zahl) return;
+    const s = document.createElement("span");
+    s.className = "fact";
+    s.innerHTML = `<b>${zahl}</b>`;
+    s.appendChild(document.createTextNode(text));
+    facts.appendChild(s);
+  };
+  const erstZahl = (a) => gestellt.filter((id) => st(id).erst === a).length;
+  fakt(mitHinweis, "richtig mit Hinweis");
+  fakt(erstZahl("teilweise"), "teilweise");
+  fakt(erstZahl("falsch"), "falsch");
+  fakt(erstZahl("geloest"), "gelöst");
+  fakt(erstZahl("uebersprungen"), "übersprungen");
+  fakt(spaeter.length, "nach Wiederholung richtig");
+  if (n && erstRichtig.length === n) fakt(n, "alle beim ersten Mal");
+
+  const liste = $("misslist");
+  liste.innerHTML = "";
+  const reihe = (id) => (NACH_ID[id].bereich === "marpol" ? 0 : 100) + NACH_ID[id].nummer;
+  const nachzuarbeiten = gestellt.filter((id) => st(id).erst !== "richtig").sort((a, b) => reihe(a) - reihe(b));
+  $("miss-eyebrow").hidden = !nachzuarbeiten.length;
+  for (const id of nachzuarbeiten) {
+    const f = NACH_ID[id];
+    const s = st(id);
+    const b = document.createElement("button");
+    b.type = "button";
+    const nochOffen = s.final === "offen" || s.final === null;
+    b.className = "miss" + (nochOffen ? "" : " later");
+    b.innerHTML = `<b>${kurz(f)}</b>`;
+    const span = document.createElement("span");
+    span.textContent = f.frage.split("\n")[0];
+    const small = document.createElement("small");
+    small.textContent = {
+      richtig: `beim ${s.versuche}. Versuch richtig`,
+      offen: `offen nach ${s.versuche} Versuchen`,
+      teilweise: "teilweise richtig",
+      uebersprungen: "übersprungen",
+    }[s.final] || "nicht abgeschlossen";
+    span.appendChild(small);
+    b.appendChild(span);
+    b.addEventListener("click", () => loesungsPanel(id, true));
+    liste.appendChild(b);
+  }
+  $("btn-fehler").hidden = !nachzuarbeiten.length;
+  $("btn-fehler").textContent = `Fehler nochmals üben (${nachzuarbeiten.length})`;
+  runde.fehler = nachzuarbeiten;
+}
+
+/* ---------- Alle Fragen ---------- */
+const LERN_KLASSE = { richtig: "ok", falsch: "no", geloest: "no", teilweise: "skip", uebersprungen: "skip" };
+
+function listeRendern() {
+  const q = Bewertung.falten($("suche").value.trim());
+  const box = $("such-treffer");
+  box.innerHTML = "";
+  const imFilter = FRAGEN.filter((f) => listenFilter === "alle" || f.bereich === listenFilter);
+  const treffer = imFilter.filter((f) => !q || Bewertung.falten(f.frage + " " + loesungText(f)).includes(q));
+  $("such-zahl").textContent = q ? `${treffer.length} von ${imFilter.length} Fragen` : `${imFilter.length} Fragen`;
+  for (const f of treffer) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "such-zeile";
+    b.innerHTML = `<b>${kurz(f)}</b>`;
+    const t = document.createElement("span");
+    t.className = "zeile-text";
+    const s = document.createElement("span");
+    s.textContent = f.frage;
+    const small = document.createElement("small");
+    const l = lernstand[f.id];
+    small.innerHTML = `<i class="dot ${l ? LERN_KLASSE[l] : ""}" aria-hidden="true"></i>`;
+    small.appendChild(document.createTextNode(nrText(f) + (l ? ` · zuletzt ${ERGEBNIS_TEXT[l]}` : " · noch nicht geübt")));
+    t.append(s, small);
+    b.appendChild(t);
+    b.addEventListener("click", () => loesungsPanel(f.id, false));
+    box.appendChild(b);
+  }
+}
+
+function listeOeffnen() {
+  if (screenJetzt === "frage") { toast("Während der Runde nicht verfügbar"); return; }
+  vorListe = screenJetzt === "liste" ? vorListe : screenJetzt;
+  zeige("liste");
+  listeRendern();
+}
+
+$("filter").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-filter]");
+  if (!b) return;
+  listenFilter = b.dataset.filter;
+  for (const x of $("filter").querySelectorAll("[data-filter]")) x.setAttribute("aria-pressed", String(x === b));
+  listeRendern();
+});
+
+/* ---------- Panels ---------- */
+let letzterFokus = null;
+
+function panelOeffnen(id) {
+  letzterFokus = document.activeElement;
+  const p = $(id);
+  p.hidden = false;
+  const ziel = p.querySelector(".sheet-head .icon-btn") || p.querySelector(".sheet-body button") || p.querySelector("[data-schliessen]");
+  setTimeout(() => ziel && ziel.focus(), 30);
+}
+function panelSchliessen(p) {
+  p.hidden = true;
+  if (letzterFokus && document.contains(letzterFokus)) letzterFokus.focus({ preventScroll: true });
+}
+document.querySelectorAll(".sheet-wrap").forEach((p) => {
+  p.addEventListener("click", (e) => { if (e.target.closest("[data-schliessen]")) panelSchliessen(p); });
+});
+
+function loesungsPanel(id, mitAntwort) {
+  const f = NACH_ID[id];
+  $("sheet-loesung-nr").textContent = nrText(f);
+  $("sheet-loesung-titel").textContent = f.frage;
+  const body = $("sheet-loesung-body");
+  body.innerHTML = "";
+  if (mitAntwort && runde) {
+    const e = document.createElement("p");
+    e.className = "eyebrow";
+    e.textContent = "Ihre letzte Antwort";
+    body.appendChild(e);
+    const a = document.createElement("div");
+    const t = runde.st[id] && runde.st[id].letzteAntwort;
+    a.className = "eigene" + (t ? "" : " leer");
+    a.textContent = t || "Keine Antwort eingegeben";
+    body.appendChild(a);
+  }
+  const e2 = document.createElement("p");
+  e2.className = "eyebrow";
+  e2.textContent = "Musterlösung";
+  body.appendChild(e2);
+  const box = document.createElement("div");
+  box.className = "loesung";
+  loesungRendern(box, f);
+  body.appendChild(box);
+  if (f.anmerkung) {
+    const anm = document.createElement("p");
+    anm.className = "anmerkung";
+    anm.innerHTML = "<b>Anmerkung:</b> ";
+    anm.appendChild(document.createTextNode(f.anmerkung));
+    body.appendChild(anm);
+  }
+  const e3 = document.createElement("p");
+  e3.className = "eyebrow sub-eyebrow";
+  e3.textContent = "Schlüsselelemente";
+  body.appendChild(e3);
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  for (const el of f.elemente) {
+    const c = document.createElement("span");
+    c.className = "chip";
+    c.textContent = el.label;
+    if (el.pflicht) {
+      const p = document.createElement("span");
+      p.className = "pf";
+      p.textContent = "★";
+      c.appendChild(p);
+    }
+    chips.appendChild(c);
+  }
+  body.appendChild(chips);
+  panelOeffnen("sheet-loesung");
+}
+
+/* ---------- Info und Lernstand ---------- */
+function infoOeffnen() {
+  const werte = Object.values(lernstand);
+  const richtig = werte.filter((v) => v === "richtig").length;
+  $("lernstand-zeile").innerHTML = werte.length
+    ? `Geübt: <b>${werte.length}</b> von ${FRAGEN.length} Fragen, zuletzt richtig: <b>${richtig}</b>.`
+    : "Noch kein Lernstand gespeichert.";
+  const r = $("btn-lernstand-reset");
+  r.disabled = !werte.length;
+  r.textContent = "Lernstand zurücksetzen";
+  r.dataset.sicher = "";
+  panelOeffnen("sheet-info");
+}
+$("btn-lernstand-reset").addEventListener("click", () => {
+  const r = $("btn-lernstand-reset");
+  if (!r.dataset.sicher) {
+    r.dataset.sicher = "1";
+    r.textContent = "Wirklich zurücksetzen? Nochmals tippen";
+    return;
+  }
+  lernstand = {};
+  speicher.loeschen(LERN_KEY);
+  r.dataset.sicher = "";
+  r.textContent = "Lernstand zurückgesetzt";
+  r.disabled = true;
+  $("lernstand-zeile").textContent = "Noch kein Lernstand gespeichert.";
+  if (screenJetzt === "start") startRendern();
+  if (screenJetzt === "liste") listeRendern();
+  toast("Lernstand zurückgesetzt");
+});
+
+/* ---------- Toast ---------- */
+let toastZeit = null;
+function toast(text) {
+  const t = $("toast");
+  t.textContent = text;
+  t.hidden = false;
+  clearTimeout(toastZeit);
+  toastZeit = setTimeout(() => { t.hidden = true; }, 2200);
+}
+
+/* ---------- Ereignisse ---------- */
+$("btn-start").addEventListener("click", neueRunde);
+$("btn-falsche").addEventListener("click", () => {
+  const ids = bisherFalsche(einstellung.bereich);
+  if (ids.length) rundeStarten(ids);
+});
+$("btn-liste").addEventListener("click", listeOeffnen);
+$("btn-liste-2").addEventListener("click", listeOeffnen);
+$("btn-info").addEventListener("click", infoOeffnen);
+$("btn-info-2").addEventListener("click", infoOeffnen);
+$("suche").addEventListener("input", listeRendern);
+
+$("antwort").addEventListener("input", () => { $("btn-pruefen").disabled = !$("antwort").value.trim(); });
+$("btn-pruefen").addEventListener("click", pruefen);
+$("btn-hinweis").addEventListener("click", hinweisZeigen);
+$("btn-loesen").addEventListener("click", loesen);
+$("btn-ueberspringen").addEventListener("click", ueberspringen);
+$("btn-doch").addEventListener("click", dochRichtig);
+$("btn-weiter").addEventListener("click", weiter);
+
+$("btn-fehler").addEventListener("click", () => rundeStarten(runde.fehler));
+$("btn-neu").addEventListener("click", neueRunde);
+$("btn-zum-start").addEventListener("click", () => { zeige("start"); startRendern(); });
+
+$("btn-zurueck").addEventListener("click", () => {
+  if (screenJetzt === "frage") return panelOeffnen("sheet-beenden");
+  if (screenJetzt === "liste" && vorListe === "ergebnis" && runde) return zeige("ergebnis");
+  zeige("start");
+  startRendern();
+});
+$("btn-beenden-ja").addEventListener("click", () => {
+  $("sheet-beenden").hidden = true;
+  runde.vorzeitig = runde.queue.length > 0 || !aktuell.abgeschlossen;
+  // Eine bereits ausgewertete, aber noch nicht bestätigte Frage zählt mit.
+  if (!aktuell.abgeschlossen && aktuell.ausgang) { aktuell.abgeschlossen = true; verbuchen(aktuell.ausgang); }
+  runde.queue = [];
+  ergebnisZeigen();
+});
+
+document.addEventListener("keydown", (e) => {
+  const offen = [...document.querySelectorAll(".sheet-wrap")].find((p) => !p.hidden);
+  if (e.key === "Escape" && offen) { panelSchliessen(offen); return; }
+  if (offen) return;
+  if (screenJetzt !== "frage") return;
+  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    if (!$("auswertung").hidden) weiter();
+    else pruefen();
+  }
+});
+
+/* ---------- Offlinebetrieb ---------- */
+function offlineStatus(text) { $("offline-status").textContent = text; }
+if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+  navigator.serviceWorker.register("sw.js").then(() => {
+    offlineStatus("Offline verfügbar: Die App ist auf diesem Gerät gespeichert und startet auch ohne Netz.");
+  }).catch(() => offlineStatus("Offlinespeicher nicht verfügbar. Die App läuft, braucht aber beim Öffnen eine Verbindung."));
+} else {
+  offlineStatus("Offline-Installation ist nur über eine Webadresse (z. B. GitHub Pages) möglich, nicht beim Öffnen als Datei.");
+}
+
+/* ---------- Start ---------- */
+zeige("start");
+startRendern();
+window.__marpolbsu = { Bewertung, FRAGEN, ordnen, ziehen, mixAnteil, BEREICHE };
+</script>
+</body>
+</html>
