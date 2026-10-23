@@ -7,7 +7,7 @@
    (GitHub Pages) läuft.
    ========================================================================== */
 
-const BESTAND = "marpolbsu-v1";
+const BESTAND = "marpolbsu-v2";
 
 const DATEIEN = [
   "./",
