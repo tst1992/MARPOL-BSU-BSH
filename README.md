@@ -1,6 +1,6 @@
 # MARPOL-BSU&BSH
 
-Trainer für die Prüfungsfragen **MARPOL** (6 Fragen) und **BSU & BSH**
+Trainer für die Prüfungsfragen **MARPOL** (10 Fragen) und **BSU & BSH**
 (14 Fragen) des Sportseeschifferscheins. Die Fragen kommen in zufälliger
 Reihenfolge, die Antwort wird frei formuliert und gegen feste
 Schlüsselelemente geprüft. Danach erscheint immer die Musterlösung.
@@ -38,7 +38,7 @@ im Flugmodus. Im Info-Fenster der App steht, ob der Offlinespeicher aktiv ist.
 ## Örtlich ausprobieren
 
 `index.html` doppelklicken. Die Datei ist in sich geschlossen: Stylesheet,
-Programm und alle 20 Fragen stecken darin. Installation und Offlinebetrieb
+Programm und alle 24 Fragen stecken darin. Installation und Offlinebetrieb
 funktionieren erst über eine Webadresse (GitHub Pages oder z. B.
 `python3 -m http.server 8080` in diesem Ordner).
 
@@ -48,9 +48,9 @@ funktionieren erst über eine Webadresse (GitHub Pages oder z. B.
 
 | Bereich   | Rundengrösse                                              |
 | --------- | --------------------------------------------------------- |
-| MARPOL    | alle 6 Fragen                                             |
+| MARPOL    | alle 10 Fragen                                            |
 | BSU & BSH | 10 Fragen oder alle 14                                    |
-| Gemischt  | 10 (3 MARPOL + 7 BSU & BSH), 15 (5 + 10) oder alle 20     |
+| Gemischt  | 10 (4 MARPOL + 6 BSU & BSH), 15 (6 + 9) oder alle 24      |
 
 Gemischte Runden ziehen im Verhältnis der Bestände. „Nur bisher Falsche
 üben“ stellt alle Fragen des gewählten Bereichs, die zuletzt nicht richtig
@@ -58,7 +58,7 @@ beantwortet wurden.
 
 Sehr ähnliche Fragen tragen dieselbe `gruppe` und kommen nicht direkt
 hintereinander:
-`sondergebiete` (MARPOL Nr. 1, 3, 6), `bsu-stelle` (BSU & BSH Nr. 7, 11,
+`sondergebiete` (MARPOL Nr. 1, 3, 6, 7, 10), `bsu-stelle` (BSU & BSH Nr. 7, 11,
 12, 13), `flagge` (BSU & BSH Nr. 8, 9).
 
 ## Bewertung und Wiederholung
@@ -121,7 +121,7 @@ Die Fragen stehen in `index.html` im Block
 - **`mindestanzahl`**: so viele Elemente braucht „Richtig“ (zusätzlich zu allen
   Pflichtelementen). „Teilweise“ ab der Hälfte davon.
 
-Nach einer Änderung in `sw.js` die Zeile `const BESTAND = "marpolbsu-v1";`
+Nach einer Änderung in `sw.js` die Zeile `const BESTAND = "marpolbsu-v3";`
 hochzählen (`v2`, `v3` …), damit installierte Apps die neue Fassung laden.
 
 ## Datengrundlage
@@ -135,6 +135,11 @@ wörtlich übernommen, mit diesen Ausnahmen:
   Flaggenzertifikat ist entfallen.
 - **BSU & BSH Nr. 14**: Die Registerpflicht gilt erst bei einer Rumpflänge
   von mehr als 15 m (§ 10 SchRegO); Merkhilfe angepasst.
+- **MARPOL Nr. 7 bis 10**: neu aufgenommen. Musterlösungen von Nr. 8 bis 10
+  gekürzt und ergänzt: Nr. 8 um ozeanographische Verhältnisse und
+  Schiffsverkehr, Nr. 9 um „jedes Freisetzen, gleich aus welcher Ursache“
+  (Art. 2 Nr. 3 MARPOL), Nr. 10 um „zerkleinert ≤ 25 mm“ und „in Fahrt“
+  (Anlage V Regel 6). Bei Nr. 9 zählen alle sieben Begriffe aus Art. 2 Nr. 3.
 - **BSU & BSH Nr. 2**: Punkt zur Bewegung der Wasserteilchen in der
   brechenden Welle ergänzt.
 - Formatfehler bereinigt: BSU & BSH Nr. 12 (offene Klammer), MARPOL Nr. 3

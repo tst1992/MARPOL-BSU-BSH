@@ -519,7 +519,7 @@ input#suche:focus{border-color:var(--stbd);outline:none}
     </div>
     <div class="sheet-body">
       <p class="help-h">Bereiche und Runden</p>
-      <p><strong>MARPOL</strong>: alle 6 Fragen. <strong>BSU &amp; BSH</strong>: 10 Fragen oder alle 14. <strong>Gemischt</strong>: 10 Fragen (3 MARPOL + 7 BSU &amp; BSH), 15 Fragen (5 + 10) oder alle 20. Die Reihenfolge ist zufällig; sehr ähnliche Fragen kommen nicht direkt hintereinander.</p>
+      <p><strong>MARPOL</strong>: alle 10 Fragen. <strong>BSU &amp; BSH</strong>: 10 Fragen oder alle 14. <strong>Gemischt</strong>: 10 Fragen (4 MARPOL + 6 BSU &amp; BSH), 15 Fragen (6 + 9) oder alle 24. Die Reihenfolge ist zufällig; sehr ähnliche Fragen kommen nicht direkt hintereinander.</p>
 
       <p class="help-h">Bewertung</p>
       <p>Jede Frage hat feste Schlüsselelemente. Die App sucht sie in Ihrer Antwort, auch in anderer Wortform, in zusammengesetzten Wörtern, als Abkürzung (z. B. BSU, BSH, IBS) und mit kleinen Tippfehlern. Umlaute, ß und Gross- und Kleinschreibung spielen keine Rolle.</p>
@@ -545,9 +545,10 @@ input#suche:focus{border-color:var(--stbd);outline:none}
 
       <hr class="keyline">
       <p class="help-h">Datengrundlage</p>
-      <p>Fragensammlungen „MARPOL“ (6 Fragen) und „BSU/BSH“ (14 Fragen). Fragen und Musterlösungen sind wörtlich übernommen, mit diesen Ausnahmen:</p>
+      <p>Fragensammlungen „MARPOL“ (10 Fragen) und „BSU/BSH“ (14 Fragen). Fragen und Musterlösungen sind wörtlich übernommen, mit diesen Ausnahmen:</p>
       <p><strong>BSU &amp; BSH Nr. 8</strong>: Das Schiffszertifikat stellt das Registergericht (Amtsgericht) aus, nicht das BSH (§ 60 SchRegO). Den Internationalen Bootsschein stellt auch der ADAC aus.</p>
       <p><strong>BSU &amp; BSH Nr. 14</strong>: Die Registerpflicht gilt erst bei einer Rumpflänge von mehr als 15 m (§ 10 SchRegO); Merkhilfe angepasst.</p>
+      <p><strong>MARPOL Nr. 8 bis 10</strong>: Musterlösungen gekürzt und ergänzt (Nr. 8: ozeanographische Verhältnisse und Schiffsverkehr; Nr. 9: „jedes Freisetzen, gleich aus welcher Ursache“ nach Art. 2 Nr. 3; Nr. 10: Lebensmittelabfälle nur zerkleinert ≤ 25 mm und in Fahrt nach Anlage V Regel 6).</p>
       <p><strong>BSU &amp; BSH Nr. 2</strong>: Ein Punkt zur Bewegung der Wasserteilchen in der brechenden Welle ist ergänzt.</p>
       <p>Formatfehler bereinigt in BSU &amp; BSH Nr. 12 und MARPOL Nr. 3 und 6. Die Hinweise sind für diese App neu formuliert.</p>
       <p>Kein Server, keine Anmeldung, keine Übertragung. Gespeichert werden nur Ihre letzte Einstellung und der Lernstand in diesem Browser.</p>
@@ -1093,6 +1094,357 @@ input#suche:focus{border-color:var(--stbd);outline:none}
           "abgas",
           "schadstoff",
           "chemikal"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m07",
+    "bereich": "marpol",
+    "nummer": 7,
+    "gruppe": "sondergebiete",
+    "frage": "Das Internationale Übereinkommen von 1973 zur Verhütung der Meeresverschmutzung durch Schiffe (MARPOL) weist Sondergebiete aus. Welches sind die Sondergebiete gemäß MARPOL?",
+    "loesung": [
+      {
+        "p": "Ostsee, Nordsee, Mittelmeer, Schwarzes Meer, Rotes Meer, Persischer Golf, Karibik und Antarktis."
+      }
+    ],
+    "hinweis": "Acht Gebiete: vier Meere rund um Europa, zwei im Nahen Osten, eines in Mittelamerika und eines am Südpol.",
+    "mindestanzahl": 6,
+    "elemente": [
+      {
+        "label": "Ostsee",
+        "treffer": [
+          "ostsee",
+          "~ostsee",
+          "baltische see",
+          "baltic"
+        ]
+      },
+      {
+        "label": "Nordsee",
+        "treffer": [
+          "nordsee",
+          "north sea",
+          "=nord"
+        ]
+      },
+      {
+        "label": "Mittelmeer",
+        "treffer": [
+          "mittelmeer",
+          "mediterran"
+        ]
+      },
+      {
+        "label": "Schwarzes Meer",
+        "treffer": [
+          "schwarze meer",
+          "schwarzes meer",
+          "schwarzmeer",
+          "black sea"
+        ]
+      },
+      {
+        "label": "Rotes Meer",
+        "treffer": [
+          "rote meer",
+          "rotes meer",
+          "red sea"
+        ]
+      },
+      {
+        "label": "Persischer Golf",
+        "treffer": [
+          "persisch",
+          "persian",
+          "golfgebiet",
+          "arabischer golf",
+          "^golf"
+        ]
+      },
+      {
+        "label": "Karibik",
+        "treffer": [
+          "karibik",
+          "karibisch",
+          "caribbean",
+          "=karibi"
+        ]
+      },
+      {
+        "label": "Antarktis",
+        "treffer": [
+          "antarkt",
+          "antarctic",
+          "suedpol",
+          "südpolarmeer"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m08",
+    "bereich": "marpol",
+    "nummer": 8,
+    "frage": "Warum werden die genannten Seegebiete derart bezeichnet?",
+    "loesung": [
+      {
+        "p": "Wegen ihrer ozeanographischen und ökologischen Verhältnisse und ihres Schiffsverkehrs brauchen sie besonderen Schutz vor Verschmutzung."
+      }
+    ],
+    "hinweis": "Drei Gründe: das Wasser selbst, das Leben darin und das, was darauf fährt.",
+    "mindestanzahl": 3,
+    "elemente": [
+      {
+        "label": "Ozeanographische Verhältnisse",
+        "treffer": [
+          "ozeanograph",
+          "ozeanogr",
+          "hydrograph",
+          "wasseraustausch",
+          "geschlossen",
+          "abgeschlossen",
+          "randmeer",
+          "binnenmeer",
+          "nebenmeer",
+          "flachwasser",
+          "flach",
+          "stroemung",
+          "meereskundlich"
+        ]
+      },
+      {
+        "label": "Ökologische Verhältnisse",
+        "treffer": [
+          "oekolog",
+          "oekosystem",
+          "empfindlich",
+          "sensibel",
+          "verletzlich",
+          "schutzbeduerft",
+          "natur",
+          "meeresumwelt",
+          "tierwelt",
+          "artenvielfalt"
+        ]
+      },
+      {
+        "label": "Schiffsverkehr",
+        "treffer": [
+          "verkehr",
+          "schiffsverkehr",
+          "verkehrsdicht",
+          "befahren",
+          "schifffahrt",
+          "viele schiffe"
+        ]
+      },
+      {
+        "label": "Besonderer Schutz vor Verschmutzung",
+        "pflicht": true,
+        "treffer": [
+          "schutz",
+          "geschuetzt",
+          "schuetzen",
+          "verschmutz",
+          "verunreinig",
+          "besondere massnahmen",
+          "strengere",
+          "verschaerft"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m09",
+    "bereich": "marpol",
+    "nummer": 9,
+    "frage": "Was versteht MARPOL unter Einleiten von Schadstoffen?",
+    "loesung": [
+      {
+        "p": "Jedes Freisetzen von Schadstoffen aus einem Schiff, gleich aus welcher Ursache, z. B. Entweichen, Auslaufen, Lecken, Pumpen, Entleeren."
+      }
+    ],
+    "anmerkung": "Vollständige Aufzählung nach Art. 2 Nr. 3 MARPOL: Entweichen, Beseitigen, Auslaufen, Lecken, Pumpen, Auswerfen und Entleeren. Jeder dieser Begriffe zählt.",
+    "hinweis": "Der Oberbegriff beginnt mit „frei…“. Die Ursache spielt keine Rolle. Dazu einige Beispiele, wie Stoffe vom Schiff ins Wasser gelangen.",
+    "mindestanzahl": 5,
+    "elemente": [
+      {
+        "label": "Jedes Freisetzen aus einem Schiff",
+        "pflicht": true,
+        "treffer": [
+          "freisetz",
+          "freigesetzt",
+          "freiwerden",
+          "freiwerd",
+          "jedes gelangen",
+          "release"
+        ]
+      },
+      {
+        "label": "Gleich aus welcher Ursache",
+        "treffer": [
+          "ursache",
+          "unabhaengig",
+          "gleichviel",
+          "gleich aus",
+          "gleich wie",
+          "egal wie",
+          "egal aus",
+          "egal warum",
+          "beabsichtigt",
+          "unbeabsichtigt",
+          "absichtlich",
+          "versehentlich",
+          "vorsaetzlich",
+          "fahrlaessig"
+        ]
+      },
+      {
+        "label": "Entweichen",
+        "treffer": [
+          "entweich",
+          "entwich"
+        ]
+      },
+      {
+        "label": "Beseitigen",
+        "treffer": [
+          "beseitig"
+        ]
+      },
+      {
+        "label": "Auslaufen",
+        "treffer": [
+          "auslauf",
+          "ausgelaufen",
+          "auslaeuf",
+          "ausfliess"
+        ]
+      },
+      {
+        "label": "Lecken",
+        "treffer": [
+          "^leck",
+          "^leak"
+        ]
+      },
+      {
+        "label": "Pumpen",
+        "treffer": [
+          "^pump",
+          "abpump",
+          "ausgepumpt",
+          "auspump",
+          "lenzen",
+          "^lenz"
+        ]
+      },
+      {
+        "label": "Auswerfen",
+        "treffer": [
+          "auswerf",
+          "ausgeworfen",
+          "ueber bord werf",
+          "ueberbord werf",
+          "werfen"
+        ]
+      },
+      {
+        "label": "Entleeren",
+        "treffer": [
+          "entleer",
+          "ablassen",
+          "abgelassen",
+          "ausleeren"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m10",
+    "bereich": "marpol",
+    "nummer": 10,
+    "gruppe": "sondergebiete",
+    "frage": "Welches Verbot hinsichtlich Schiffsmüll hat man auf einer Yacht zu beachten, die in der Ostsee von Danzig nach Rostock bestimmt ist?",
+    "loesung": [
+      {
+        "p": "Ostsee ist Sondergebiet: Kunststoffe und sonstiger Müll sind verboten. Nur zerkleinerte Lebensmittelabfälle (≤ 25 mm) dürfen in Fahrt und mindestens 12 sm vom nächsten Land eingebracht werden."
+      }
+    ],
+    "hinweis": "Die Ostsee hat einen besonderen Status. Nur eine Abfallart darf über Bord, und das nur unter drei Bedingungen.",
+    "mindestanzahl": 4,
+    "elemente": [
+      {
+        "label": "Ostsee ist Sondergebiet",
+        "treffer": [
+          "sondergebiet",
+          "special area",
+          "marpol gebiet",
+          "schutzgebiet"
+        ]
+      },
+      {
+        "label": "Kunststoffe und sonstiger Müll verboten",
+        "pflicht": true,
+        "verneinend": true,
+        "treffer": [
+          "^verbot",
+          "untersagt",
+          "nicht erlaubt",
+          "nicht zulässig",
+          "nicht gestattet",
+          "nicht beseitigt",
+          "nicht entsorgt",
+          "nicht eingebracht",
+          "nicht über bord",
+          "darf nicht",
+          "dürfen nicht",
+          "plastik nicht",
+          "kunststoff nicht",
+          "müll nicht",
+          "an land",
+          "im hafen",
+          "mitnehmen",
+          "aufbewahren"
+        ]
+      },
+      {
+        "label": "Lebensmittelabfälle zerkleinert (≤ 25 mm)",
+        "treffer": [
+          "zerkleiner",
+          "gemahlen",
+          "zermahlen",
+          "mahlen",
+          "gehäckselt",
+          "püriert",
+          "#25-25",
+          "^25mm"
+        ]
+      },
+      {
+        "label": "Nur in Fahrt",
+        "treffer": [
+          "in fahrt",
+          "waehrend der fahrt",
+          "^fahrt",
+          "fahrend",
+          "unterwegs",
+          "en route",
+          "in bewegung",
+          "nicht vor anker",
+          "nicht im hafen"
+        ]
+      },
+      {
+        "label": "Mindestens 12 sm vom nächsten Land",
+        "pflicht": true,
+        "treffer": [
+          "#12-12",
+          "=zwoelf",
+          "^12sm",
+          "^12nm"
         ]
       }
     ]
