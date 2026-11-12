@@ -53,8 +53,33 @@ funktionieren erst über eine Webadresse (GitHub Pages oder z. B.
 | Gemischt  | 10 (4 MARPOL + 6 BSU & BSH), 15 (6 + 9) oder alle 24      |
 
 Gemischte Runden ziehen im Verhältnis der Bestände. „Nur bisher Falsche
-üben“ stellt alle Fragen des gewählten Bereichs, die zuletzt nicht richtig
-beantwortet wurden.
+üben“ stellt alle Fragen des gewählten Bereichs, die beim letzten ersten
+Versuch nicht richtig beantwortet wurden.
+
+## Lernstand und Auswahl der Fragen
+
+Die App speichert im Browser (`localStorage`, Schlüssel `marpolbsu.lernstand`)
+für jede Frage, wie oft und in welcher Runde sie zuletzt gestellt wurde, und
+die Punkte der letzten fünf **ersten** Versuche je Runde: richtig und „Doch
+richtig“ 1, teilweise 0,5, falsch, gelöst und übersprungen 0. Ein Lernstand
+der früheren Fassung (nur letztes Ergebnis) wird beim ersten Start als
+Startwert übernommen.
+
+Runden, die nicht alle Fragen eines Bereichs umfassen (BSU & BSH 10,
+Gemischt 10 und 15), wählen gewichtet aus. Gemischte Runden behalten das
+Verhältnis und gewichten innerhalb von MARPOL und BSU & BSH getrennt.
+
+- Noch nie gestellte Fragen kommen zuerst.
+- Danach gilt: Priorität = Runden seit dem letzten Stellen × Gewicht. Das
+  Gewicht reicht von 1 (zuletzt immer richtig) bis 4 (immer falsch).
+- Keine Frage setzt länger aus als 3 × (Bestand ÷ gezogene Anzahl,
+  aufgerundet) Runden.
+
+Das Balkensymbol oben rechts öffnet die Ansicht **Fortschritt**: eine Kachel
+je Frage, getrennt nach Bereich (grün sicher ab 80 %, gelb teilweise ab 40 %,
+rot darunter, grau neu). Darunter lässt sich der Lernstand als Datei
+ausgeben, wieder einlesen oder nach einer Rückfrage löschen. Auf der
+Startseite steht eine Kurzübersicht, in „Alle Fragen“ je Frage die Quote.
 
 Sehr ähnliche Fragen tragen dieselbe `gruppe` und kommen nicht direkt
 hintereinander:
@@ -121,7 +146,7 @@ Die Fragen stehen in `index.html` im Block
 - **`mindestanzahl`**: so viele Elemente braucht „Richtig“ (zusätzlich zu allen
   Pflichtelementen). „Teilweise“ ab der Hälfte davon.
 
-Nach einer Änderung in `sw.js` die Zeile `const BESTAND = "marpolbsu-v3";`
+Nach einer Änderung in `sw.js` die Zeile `const BESTAND = "marpolbsu-v4";`
 hochzählen (`v2`, `v3` …), damit installierte Apps die neue Fassung laden.
 
 ## Datengrundlage
@@ -150,5 +175,5 @@ Die Hinweise sind für diese App neu formuliert.
 ## Datenschutz
 
 Keine Übertragung, kein Tracking. Gespeichert werden nur die zuletzt
-gewählte Einstellung und der Lernstand (letztes Ergebnis je Frage) im
-`localStorage` des Browsers. Zurücksetzen im Info-Fenster.
+gewählte Einstellung und der Lernstand im
+`localStorage` des Browsers. Löschen in der Ansicht Fortschritt.
