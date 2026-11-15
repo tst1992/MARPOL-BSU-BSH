@@ -102,6 +102,10 @@ sich die Bewertung überstimmen.
 - **Teilweise** oder **übersprungen**: keine Wiederholung in der Runde, aber
   Eintrag im Ergebnis unter „Noch einmal ansehen“ und in
   „Fehler nochmals üben“.
+- **Richtig** beantwortet: Mit **„Nochmals fragen“** kommt die Frage nach drei
+  bis sechs anderen Fragen nochmals, so oft man möchte. Sie zählt weiter als
+  beim ersten Mal richtig. Wird sie bei der Wiederholung nicht richtig
+  beantwortet, gelten die normalen Regeln.
 
 ## Fragen bearbeiten
 
